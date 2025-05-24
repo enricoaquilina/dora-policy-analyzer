@@ -1,0 +1,79 @@
+# DORA Compliance Agent Orchestration Platform - Workflow Engine Dependencies
+
+# Core async framework
+asyncio-mqtt==0.16.1
+aiofiles==23.2.1
+aiohttp==3.9.1
+aioredis==2.0.1
+
+# Database connections
+asyncpg==0.29.0
+motor==3.3.2  # Async MongoDB driver
+neo4j==5.15.0
+
+# Event streaming
+kafka-python==2.0.2
+aiokafka==0.9.0
+
+# Kubernetes integration
+kubernetes==28.1.0
+kubernetes-asyncio==28.2.0
+
+# Data processing and validation
+pydantic==2.5.2
+marshmallow==3.20.2
+jsonschema==4.20.0
+
+# Graph and workflow processing
+langgraph==0.0.62
+langchain==0.1.0
+langchain-core==0.1.12
+langchain-community==0.0.10
+
+# Security and encryption
+cryptography==41.0.8
+PyJWT==2.8.0
+hvac==2.1.0  # HashiCorp Vault client
+
+# Monitoring and observability
+prometheus-client==0.19.0
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+opentelemetry-exporter-prometheus==1.12.0
+structlog==23.2.0
+
+# Configuration and utilities
+python-dotenv==1.0.0
+click==8.1.7
+typer==0.9.0
+rich==13.7.0
+pyyaml==6.0.1
+jinja2==3.1.2
+
+# HTTP and networking
+httpx==0.25.2
+urllib3==2.1.0
+requests==2.31.0
+
+# Testing (development)
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-mock==3.12.0
+pytest-cov==4.1.0
+httpx==0.25.2
+
+# Type checking (development)
+mypy==1.7.1
+types-requests==2.31.0.10
+types-PyYAML==6.0.12.12
+
+# Code quality (development)
+black==23.11.0
+flake8==6.1.0
+isort==5.12.0
+pre-commit==3.6.0
+
+# Documentation (development)
+mkdocs==1.5.3
+mkdocs-material==9.4.8
+mkdocs-mermaid2-plugin==1.1.1 

@@ -1,0 +1,240 @@
+# Audit Logs Topic - System audit trail
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: audit-logs
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: audit-logging
+spec:
+  partitions: 24  # Higher partitions for high-volume audit data
+  replicas: 3
+  config:
+    retention.ms: 189216000000  # 6 years - regulatory audit retention
+    segment.ms: 86400000        # 1 day
+    cleanup.policy: delete
+    compression.type: gzip      # Better compression for audit logs
+    min.insync.replicas: 2
+    max.message.bytes: 1048576  # 1MB - audit entries
+
+---
+# User Activities Topic - User action logging
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: user-activities
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: user-audit
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 94608000000  # 3 years - user activity history
+    segment.ms: 86400000       # 1 day
+    cleanup.policy: delete
+    compression.type: gzip
+    min.insync.replicas: 2
+    max.message.bytes: 1048576  # 1MB
+
+---
+# Data Access Topic - Data access audit logs
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: data-access
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: data-audit
+spec:
+  partitions: 18
+  replicas: 3
+  config:
+    retention.ms: 189216000000  # 6 years - data access audit retention
+    segment.ms: 86400000        # 1 day
+    cleanup.policy: delete
+    compression.type: gzip
+    min.insync.replicas: 2
+    max.message.bytes: 1048576  # 1MB
+
+---
+# System Events Topic - Infrastructure and system events
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: system-events
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: system-audit
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 31536000000  # 365 days - system events
+    segment.ms: 86400000       # 1 day
+    cleanup.policy: delete
+    compression.type: gzip
+    min.insync.replicas: 2
+    max.message.bytes: 2097152  # 2MB - system events can be larger
+
+---
+# Security Events Topic - Security-related events
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: security-events
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: security-audit
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 189216000000  # 6 years - security events require long retention
+    segment.ms: 86400000        # 1 day
+    cleanup.policy: delete
+    compression.type: gzip
+    min.insync.replicas: 2
+    max.message.bytes: 2097152  # 2MB
+
+---
+# Authentication Events Topic - Login/logout and auth events
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: authentication-events
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: auth-audit
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 94608000000  # 3 years - authentication history
+    segment.ms: 86400000       # 1 day
+    cleanup.policy: delete
+    compression.type: gzip
+    min.insync.replicas: 2
+    max.message.bytes: 1048576  # 1MB
+
+---
+# API Access Logs Topic - API call audit trail
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: api-access-logs
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: api-audit
+spec:
+  partitions: 24  # High-volume API logs
+  replicas: 3
+  config:
+    retention.ms: 31536000000  # 365 days - API access logs
+    segment.ms: 43200000       # 12 hours - more frequent segments
+    cleanup.policy: delete
+    compression.type: gzip
+    min.insync.replicas: 2
+    max.message.bytes: 1048576  # 1MB
+
+---
+# Change Management Events Topic - Configuration and change tracking
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: change-management-events
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: change-audit
+spec:
+  partitions: 6
+  replicas: 3
+  config:
+    retention.ms: 94608000000  # 3 years - change history
+    segment.ms: 86400000       # 1 day
+    cleanup.policy: delete
+    compression.type: gzip
+    min.insync.replicas: 2
+    max.message.bytes: 10485760  # 10MB - configuration changes can be large
+
+---
+# Compliance Violations Topic - Policy and regulation violations
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: compliance-violations
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: violation-audit
+spec:
+  partitions: 6
+  replicas: 3
+  config:
+    retention.ms: 189216000000  # 6 years - violations require long retention
+    segment.ms: 86400000        # 1 day
+    cleanup.policy: delete
+    compression.type: gzip
+    min.insync.replicas: 2
+    max.message.bytes: 52428800  # 50MB - violation reports with evidence
+
+---
+# Performance Metrics Topic - System performance data
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: performance-metrics
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: performance-monitoring
+spec:
+  partitions: 18
+  replicas: 3
+  config:
+    retention.ms: 7776000000  # 90 days - performance metrics
+    segment.ms: 3600000       # 1 hour - frequent segments for metrics
+    cleanup.policy: delete
+    compression.type: snappy  # Fast compression for high-volume metrics
+    min.insync.replicas: 2
+    max.message.bytes: 1048576  # 1MB
+
+---
+# Error Logs Topic - Application and system errors
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: error-logs
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: error-monitoring
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 15552000000  # 180 days - error history
+    segment.ms: 86400000       # 1 day
+    cleanup.policy: delete
+    compression.type: gzip
+    min.insync.replicas: 2
+    max.message.bytes: 10485760  # 10MB - error traces can be large 

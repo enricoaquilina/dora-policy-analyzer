@@ -1,0 +1,386 @@
+{
+  "generated_at": "2025-05-23T17:08:42.048926",
+  "technical_standards": [
+    {
+      "standard_id": "RTS_2024_001",
+      "standard_type": "RTS",
+      "title": "RTS on criteria for the classification of ICT-related incidents",
+      "description": "Technical standards specifying criteria for classifying ICT-related incidents and determining major incident thresholds",
+      "effective_date": "2025-01-17",
+      "status": "final",
+      "document_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R0001",
+      "key_provisions": [
+        "Classification criteria for ICT incidents",
+        "Major incident threshold determination",
+        "Impact assessment methodology",
+        "Severity level definitions",
+        "Reporting timeline requirements"
+      ],
+      "related_articles": [
+        "17",
+        "19",
+        "20"
+      ],
+      "implementation_requirements": [
+        "Incident classification procedures",
+        "Impact assessment tools",
+        "Escalation workflows",
+        "Reporting mechanisms"
+      ],
+      "entity_scope": [
+        "credit_institution",
+        "payment_institution",
+        "investment_firm"
+      ]
+    },
+    {
+      "standard_id": "RTS_2024_002",
+      "standard_type": "RTS",
+      "title": "RTS on simplified reporting for minor ICT-related incidents",
+      "description": "Simplified reporting procedures for minor ICT incidents to reduce administrative burden",
+      "effective_date": "2025-01-17",
+      "status": "final",
+      "document_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R0002",
+      "key_provisions": [
+        "Minor incident definition",
+        "Simplified reporting templates",
+        "Reduced documentation requirements",
+        "Streamlined approval processes"
+      ],
+      "related_articles": [
+        "17",
+        "18"
+      ],
+      "implementation_requirements": [
+        "Minor incident workflows",
+        "Simplified templates",
+        "Automated reporting tools"
+      ],
+      "entity_scope": [
+        "tier_2",
+        "small_entities"
+      ]
+    },
+    {
+      "standard_id": "RTS_2024_003",
+      "standard_type": "RTS",
+      "title": "RTS on content and templates for the register of information",
+      "description": "Technical standards for maintaining register of information on third-party ICT service providers",
+      "effective_date": "2025-01-17",
+      "status": "final",
+      "document_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R0003",
+      "key_provisions": [
+        "Register content requirements",
+        "Data fields and format specifications",
+        "Update frequency requirements",
+        "Data quality standards",
+        "Access control mechanisms"
+      ],
+      "related_articles": [
+        "28",
+        "29"
+      ],
+      "implementation_requirements": [
+        "Register database setup",
+        "Data collection procedures",
+        "Quality assurance processes",
+        "Access management systems"
+      ],
+      "entity_scope": [
+        "all_entities"
+      ]
+    },
+    {
+      "standard_id": "RTS_2024_004",
+      "standard_type": "RTS",
+      "title": "RTS on harmonised conditions and procedures for oversight fees",
+      "description": "Harmonised conditions and procedures for the collection of oversight fees by competent authorities",
+      "effective_date": "2025-01-17",
+      "status": "final",
+      "document_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R0004",
+      "key_provisions": [
+        "Fee calculation methodology",
+        "Payment procedures and timelines",
+        "Fee adjustment mechanisms",
+        "Reporting requirements"
+      ],
+      "related_articles": [
+        "34",
+        "35"
+      ],
+      "implementation_requirements": [
+        "Fee calculation systems",
+        "Payment processing setup",
+        "Financial reporting tools"
+      ],
+      "entity_scope": [
+        "supervised_entities"
+      ]
+    },
+    {
+      "standard_id": "ITS_2024_001",
+      "standard_type": "ITS",
+      "title": "ITS on standard forms, templates and procedures for incident reporting",
+      "description": "Implementing technical standards on standard forms, templates and procedures for reporting major ICT-related incidents",
+      "effective_date": "2025-01-17",
+      "status": "final",
+      "document_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1001",
+      "key_provisions": [
+        "Standardised incident reporting forms",
+        "Template specifications and formats",
+        "Submission procedures and channels",
+        "Follow-up reporting requirements",
+        "Quality control measures"
+      ],
+      "related_articles": [
+        "19",
+        "20",
+        "21"
+      ],
+      "implementation_requirements": [
+        "Reporting system integration",
+        "Template implementation",
+        "Submission workflow setup",
+        "Quality assurance processes"
+      ],
+      "entity_scope": [
+        "all_entities"
+      ]
+    },
+    {
+      "standard_id": "ITS_2024_002",
+      "standard_type": "ITS",
+      "title": "ITS on digital operational resilience testing",
+      "description": "Implementation standards for threat-led penetration testing and advanced testing methodologies",
+      "effective_date": "2025-01-17",
+      "status": "final",
+      "document_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1002",
+      "key_provisions": [
+        "TLPT methodology specifications",
+        "Testing scope and frequency",
+        "Tester qualification requirements",
+        "Testing documentation standards",
+        "Results reporting formats"
+      ],
+      "related_articles": [
+        "24",
+        "25",
+        "26"
+      ],
+      "implementation_requirements": [
+        "TLPT programme establishment",
+        "Tester procurement procedures",
+        "Testing environment setup",
+        "Results analysis systems"
+      ],
+      "entity_scope": [
+        "tier_1",
+        "significant_entities"
+      ]
+    },
+    {
+      "standard_id": "ITS_2024_003",
+      "standard_type": "ITS",
+      "title": "ITS on information sharing arrangements",
+      "description": "Technical implementation standards for cyber threat information sharing among financial entities",
+      "effective_date": "2025-01-17",
+      "status": "final",
+      "document_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1003",
+      "key_provisions": [
+        "Information sharing protocols",
+        "Data classification standards",
+        "Anonymisation requirements",
+        "Sharing platform specifications",
+        "Participation obligations"
+      ],
+      "related_articles": [
+        "45",
+        "46"
+      ],
+      "implementation_requirements": [
+        "Sharing platform access",
+        "Data classification systems",
+        "Anonymisation tools",
+        "Participation monitoring"
+      ],
+      "entity_scope": [
+        "all_entities"
+      ]
+    },
+    {
+      "standard_id": "ITS_2024_004",
+      "standard_type": "ITS",
+      "title": "ITS on supervisory cooperation and information exchange",
+      "description": "Implementation standards for cooperation between competent authorities in supervision and oversight",
+      "effective_date": "2025-01-17",
+      "status": "final",
+      "document_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1004",
+      "key_provisions": [
+        "Cooperation frameworks",
+        "Information exchange protocols",
+        "Coordination mechanisms",
+        "Joint oversight procedures"
+      ],
+      "related_articles": [
+        "32",
+        "33",
+        "34"
+      ],
+      "implementation_requirements": [
+        "Regulatory reporting systems",
+        "Coordination platforms",
+        "Information sharing protocols"
+      ],
+      "entity_scope": [
+        "supervisory_authorities"
+      ]
+    }
+  ],
+  "requirement_mappings": [
+    {
+      "requirement_id": "REQ_17_001",
+      "technical_standard_id": "RTS_2024_001",
+      "applicability_notes": "Provides detailed criteria for incident classification as required by Article 17",
+      "mapping_confidence": "high",
+      "mapping_rationale": "Direct mapping - RTS specifies classification criteria referenced in requirement"
+    },
+    {
+      "requirement_id": "REQ_17_002",
+      "technical_standard_id": "RTS_2024_001",
+      "applicability_notes": "Major incident threshold determination aligns with reporting obligations",
+      "mapping_confidence": "high",
+      "mapping_rationale": "RTS threshold criteria essential for requirement compliance"
+    },
+    {
+      "requirement_id": "REQ_19_001",
+      "technical_standard_id": "RTS_2024_001",
+      "applicability_notes": "Classification criteria support initial incident reporting requirements",
+      "mapping_confidence": "medium",
+      "mapping_rationale": "Supporting role in incident reporting process"
+    },
+    {
+      "requirement_id": "REQ_17_003",
+      "technical_standard_id": "RTS_2024_002",
+      "applicability_notes": "Simplified procedures for minor incidents reduce compliance burden",
+      "mapping_confidence": "medium",
+      "mapping_rationale": "Alternative compliance pathway for minor incidents"
+    },
+    {
+      "requirement_id": "REQ_18_001",
+      "technical_standard_id": "RTS_2024_002",
+      "applicability_notes": "Streamlined processes align with proportionate response requirements",
+      "mapping_confidence": "medium",
+      "mapping_rationale": "Supports proportionate response principle"
+    },
+    {
+      "requirement_id": "REQ_28_001",
+      "technical_standard_id": "RTS_2024_003",
+      "applicability_notes": "Direct implementation of register requirements with specific content and format standards",
+      "mapping_confidence": "high",
+      "mapping_rationale": "RTS provides mandatory implementation details"
+    },
+    {
+      "requirement_id": "REQ_28_002",
+      "technical_standard_id": "RTS_2024_003",
+      "applicability_notes": "Register maintenance procedures and update requirements",
+      "mapping_confidence": "high",
+      "mapping_rationale": "Essential for ongoing compliance"
+    },
+    {
+      "requirement_id": "REQ_29_001",
+      "technical_standard_id": "RTS_2024_003",
+      "applicability_notes": "Information sharing capabilities supported by register data",
+      "mapping_confidence": "medium",
+      "mapping_rationale": "Register data supports broader information sharing"
+    },
+    {
+      "requirement_id": "REQ_19_001",
+      "technical_standard_id": "ITS_2024_001",
+      "applicability_notes": "Standard forms implementation for major incident reporting",
+      "mapping_confidence": "high",
+      "mapping_rationale": "ITS provides mandatory reporting templates"
+    },
+    {
+      "requirement_id": "REQ_19_002",
+      "technical_standard_id": "ITS_2024_001",
+      "applicability_notes": "Submission procedures and channels for incident reports",
+      "mapping_confidence": "high",
+      "mapping_rationale": "Technical implementation of reporting process"
+    },
+    {
+      "requirement_id": "REQ_20_001",
+      "technical_standard_id": "ITS_2024_001",
+      "applicability_notes": "Follow-up reporting templates and procedures",
+      "mapping_confidence": "high",
+      "mapping_rationale": "Continuation of initial reporting process"
+    },
+    {
+      "requirement_id": "REQ_24_001",
+      "technical_standard_id": "ITS_2024_002",
+      "applicability_notes": "TLPT methodology implementation with specific technical requirements",
+      "mapping_confidence": "high",
+      "mapping_rationale": "ITS mandates specific TLPT implementation approach"
+    },
+    {
+      "requirement_id": "REQ_25_001",
+      "technical_standard_id": "ITS_2024_002",
+      "applicability_notes": "Testing scope and frequency requirements for significant entities",
+      "mapping_confidence": "high",
+      "mapping_rationale": "Essential for TLPT programme establishment"
+    },
+    {
+      "requirement_id": "REQ_26_001",
+      "technical_standard_id": "ITS_2024_002",
+      "applicability_notes": "Tester qualification and results reporting standards",
+      "mapping_confidence": "medium",
+      "mapping_rationale": "Quality assurance for TLPT process"
+    },
+    {
+      "requirement_id": "REQ_45_001",
+      "technical_standard_id": "ITS_2024_003",
+      "applicability_notes": "Technical implementation of information sharing arrangements",
+      "mapping_confidence": "high",
+      "mapping_rationale": "ITS provides technical specifications for compliance"
+    },
+    {
+      "requirement_id": "REQ_46_001",
+      "technical_standard_id": "ITS_2024_003",
+      "applicability_notes": "Data classification and anonymisation procedures",
+      "mapping_confidence": "high",
+      "mapping_rationale": "Essential privacy and security requirements"
+    }
+  ],
+  "summary": {
+    "total_standards": 8,
+    "rts_count": 4,
+    "its_count": 4,
+    "total_mappings": 16,
+    "status_distribution": {
+      "final": 8
+    },
+    "confidence_distribution": {
+      "high": 11,
+      "medium": 5
+    },
+    "articles_covered": 16,
+    "covered_articles": [
+      "17",
+      "18",
+      "19",
+      "20",
+      "21",
+      "24",
+      "25",
+      "26",
+      "28",
+      "29",
+      "32",
+      "33",
+      "34",
+      "35",
+      "45",
+      "46"
+    ],
+    "effective_date": "2025-01-17"
+  }
+}

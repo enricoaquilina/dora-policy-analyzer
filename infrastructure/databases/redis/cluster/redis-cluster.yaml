@@ -1,0 +1,432 @@
+# Redis Cluster using Redis Operator
+apiVersion: databases.spotahome.com/v1
+kind: RedisFailover
+metadata:
+  name: dora-redis-cluster
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: cache
+spec:
+  # Sentinel configuration for high availability
+  sentinel:
+    replicas: 3
+    
+    # Resource allocation for sentinels
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    
+    # Sentinel specific configuration
+    customConfig:
+      - "down-after-milliseconds 5000"
+      - "failover-timeout 10000"
+      - "parallel-syncs 2"
+      - "min-replicas-to-write 1"
+      - "min-replicas-max-lag 10"
+    
+    # Node placement
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis-sentinel
+              redisfailovers.databases.spotahome.com/name: dora-redis-cluster
+          topologyKey: kubernetes.io/hostname
+    
+    tolerations:
+    - key: "data"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    
+    nodeSelector:
+      role: data
+  
+  # Redis server configuration
+  redis:
+    replicas: 3
+    
+    # Resource allocation for Redis instances
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 2Gi
+    
+    # Storage configuration
+    storage:
+      persistentVolumeClaim:
+        metadata:
+          name: redis-data
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 50Gi
+          storageClassName: dora-standard-ssd
+    
+    # Redis specific configuration
+    customConfig:
+      # Memory management
+      - "maxmemory 1500mb"
+      - "maxmemory-policy allkeys-lru"
+      
+      # Persistence settings
+      - "save 900 1"      # Save if at least 1 key changed in 900 seconds
+      - "save 300 10"     # Save if at least 10 keys changed in 300 seconds  
+      - "save 60 10000"   # Save if at least 10000 keys changed in 60 seconds
+      - "stop-writes-on-bgsave-error yes"
+      - "rdbcompression yes"
+      - "rdbchecksum yes"
+      
+      # AOF (Append Only File) configuration
+      - "appendonly yes"
+      - "appendfilename appendonly.aof"
+      - "appendfsync everysec"
+      - "no-appendfsync-on-rewrite no"
+      - "auto-aof-rewrite-percentage 100"
+      - "auto-aof-rewrite-min-size 64mb"
+      
+      # Security settings
+      - "requirepass ${REDIS_PASSWORD}"
+      - "protected-mode yes"
+      - "port 0"           # Disable non-TLS port
+      - "tls-port 6379"    # Enable TLS port
+      - "tls-cert-file /tls/tls.crt"
+      - "tls-key-file /tls/tls.key"
+      - "tls-ca-cert-file /tls/ca.crt"
+      - "tls-protocols TLSv1.2 TLSv1.3"
+      
+      # Performance tuning
+      - "tcp-keepalive 300"
+      - "timeout 0"
+      - "tcp-backlog 511"
+      - "databases 16"
+      - "hash-max-ziplist-entries 512"
+      - "hash-max-ziplist-value 64"
+      - "list-max-ziplist-size -2"
+      - "set-max-intset-entries 512"
+      - "zset-max-ziplist-entries 128"
+      - "zset-max-ziplist-value 64"
+      
+      # Logging
+      - "loglevel notice"
+      - "syslog-enabled yes"
+      - "syslog-ident redis"
+      
+      # Client management
+      - "maxclients 10000"
+      - "client-output-buffer-limit normal 0 0 0"
+      - "client-output-buffer-limit replica 256mb 64mb 60"
+      - "client-output-buffer-limit pubsub 32mb 8mb 60"
+      
+      # Slow log
+      - "slowlog-log-slower-than 10000"  # 10ms
+      - "slowlog-max-len 128"
+      
+      # Latency monitoring
+      - "latency-monitor-threshold 100"  # 100ms
+    
+    # Security context
+    securityContext:
+      runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
+    
+    # Node placement
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis
+              redisfailovers.databases.spotahome.com/name: dora-redis-cluster
+          topologyKey: kubernetes.io/hostname
+    
+    tolerations:
+    - key: "data"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    
+    nodeSelector:
+      role: data
+    
+    # Pod disruption budget
+    podDisruptionBudget:
+      minAvailable: 2
+  
+  # Authentication
+  auth:
+    secretPath: redis-password
+
+---
+# Secret for Redis authentication
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redis-password
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/part-of: dora-compliance
+type: Opaque
+stringData:
+  password: "dora-redis-secure-password-change-me"
+
+---
+# TLS certificates for Redis
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redis-tls-certs
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/part-of: dora-compliance
+type: kubernetes.io/tls
+data:
+  tls.crt: # Base64 encoded certificate
+  tls.key: # Base64 encoded private key
+  ca.crt:  # Base64 encoded CA certificate
+
+---
+# ConfigMap for Redis configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/part-of: dora-compliance
+data:
+  redis.conf: |
+    # Database configuration for DORA compliance system
+    # Database 0: Session store
+    # Database 1: Application cache
+    # Database 2: Rate limiting
+    # Database 3: Temporary computations
+    # Database 4: Real-time notifications
+    # Database 5: Distributed locks
+    # Database 6: Agent heartbeats
+    # Database 7: Metrics cache
+    # Database 8-15: Reserved for future use
+    
+    # Memory optimization for different data types
+    hash-max-ziplist-entries 512
+    hash-max-ziplist-value 64
+    list-max-ziplist-size -2
+    list-compress-depth 0
+    set-max-intset-entries 512
+    zset-max-ziplist-entries 128
+    zset-max-ziplist-value 64
+    
+    # Keyspace notifications for cache invalidation
+    notify-keyspace-events Ex
+    
+    # Memory usage reporting
+    memory-usage-sample-size 5
+
+---
+# Service for Redis master access
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: master
+spec:
+  type: ClusterIP
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: 6379
+    protocol: TCP
+  - name: redis-tls
+    port: 6380
+    targetPort: 6380
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/part-of: dora-compliance
+    role: master
+
+---
+# Service for Redis sentinel access
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-sentinel
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: redis-sentinel
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: sentinel
+spec:
+  type: ClusterIP
+  ports:
+  - name: sentinel
+    port: 26379
+    targetPort: 26379
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: redis-sentinel
+    app.kubernetes.io/part-of: dora-compliance
+
+---
+# ServiceMonitor for Prometheus monitoring
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: redis-metrics
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/part-of: dora-compliance
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics
+    scheme: http
+
+---
+# Redis Exporter for metrics
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-exporter
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: redis-exporter
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis-exporter
+      app.kubernetes.io/part-of: dora-compliance
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: redis-exporter
+        app.kubernetes.io/part-of: dora-compliance
+    spec:
+      containers:
+      - name: redis-exporter
+        image: oliver006/redis_exporter:v1.55.0
+        ports:
+        - containerPort: 9121
+          name: metrics
+        env:
+        - name: REDIS_ADDR
+          value: "redis://redis-master:6379"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis-password
+              key: password
+        - name: REDIS_EXPORTER_CHECK_KEYS
+          value: "*"
+        - name: REDIS_EXPORTER_CHECK_SINGLE_KEYS
+          value: "sessions:*,cache:*,locks:*"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+      
+      nodeSelector:
+        role: data
+      
+      tolerations:
+      - key: "data"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+
+---
+# Service for Redis Exporter
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-exporter
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: redis-exporter
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  type: ClusterIP
+  ports:
+  - name: metrics
+    port: 9121
+    targetPort: 9121
+  selector:
+    app.kubernetes.io/name: redis-exporter
+    app.kubernetes.io/part-of: dora-compliance
+
+---
+# NetworkPolicy for Redis security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis-network-policy
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/part-of: dora-compliance
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: dora-system
+    - namespaceSelector:
+        matchLabels:
+          name: dora-agents
+    ports:
+    - protocol: TCP
+      port: 6379
+    - protocol: TCP
+      port: 6380
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: dora-monitoring
+    ports:
+    - protocol: TCP
+      port: 9121  # Redis exporter metrics
+  egress:
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 53    # DNS
+    - protocol: UDP
+      port: 53    # DNS 

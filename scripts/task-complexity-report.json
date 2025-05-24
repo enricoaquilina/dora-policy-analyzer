@@ -1,0 +1,243 @@
+{
+  "meta": {
+    "generatedAt": "2025-05-23T13:31:44.993Z",
+    "tasksAnalyzed": 27,
+    "thresholdScore": 5,
+    "projectName": "Taskmaster",
+    "usedResearch": false
+  },
+  "complexityAnalysis": [
+    {
+      "taskId": 7,
+      "taskTitle": "Develop Error Handling Framework",
+      "complexityScore": 8,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Break down the Error Handling Framework task into 6 subtasks covering error categorization, retry strategies, circuit breakers, error reporting, automated recovery, and exception handling patterns. For each subtask, provide a title, description, dependencies, and detailed implementation requirements.",
+      "reasoning": "This task involves complex fault tolerance mechanisms requiring sophisticated error handling patterns, recovery procedures, and integration with multiple system components. The high complexity stems from the need to handle various error scenarios across distributed components while maintaining system reliability."
+    },
+    {
+      "taskId": 8,
+      "taskTitle": "Design for Scalability and Performance",
+      "complexityScore": 9,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Break down the Scalability and Performance task into 7 subtasks covering load balancing, sharding strategies, caching implementation, horizontal scaling, performance testing, bottleneck identification, and auto-scaling capabilities. For each subtask, provide a title, description, dependencies, and detailed implementation requirements.",
+      "reasoning": "This task requires deep architectural expertise across multiple dimensions of system performance and scalability. It depends on numerous completed components and must address complex technical challenges like distributed caching, load balancing, and auto-scaling while maintaining system integrity."
+    },
+    {
+      "taskId": 5,
+      "taskTitle": "Gap Assessment Agent",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Break down the Gap Assessment Agent task into 6 subtasks covering gap analysis algorithms, priority ranking system, recommendation generation, DORA article mapping, policy language suggestion engine, and effort estimation. For each subtask, provide a title, description, dependencies, and detailed implementation requirements.",
+      "reasoning": "This agent requires sophisticated analysis capabilities to identify compliance gaps, prioritize them, and generate actionable recommendations. It builds on the Policy Analyzer and must integrate with DORA requirements database while providing business-critical outputs for CIOs."
+    },
+    {
+      "taskId": 6,
+      "taskTitle": "Risk Calculator Agent",
+      "complexityScore": 8,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Break down the Risk Calculator Agent task into 7 subtasks covering penalty calculation models, implementation cost estimation, ROI analysis algorithms, business case generation, financial impact visualization, executive reporting, and sensitivity analysis. For each subtask, provide a title, description, dependencies, and detailed implementation requirements.",
+      "reasoning": "This agent involves complex financial modeling, cost estimation, and business case generation requiring both technical and financial domain expertise. It must accurately calculate potential penalties, implementation costs, and ROI metrics while producing executive-ready documentation."
+    },
+    {
+      "taskId": 7,
+      "taskTitle": "Implementation Planner Agent",
+      "complexityScore": 7,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Break down the Implementation Planner Agent task into 6 subtasks covering project plan generation, timeline estimation, resource allocation algorithms, dependency mapping, milestone tracking, and visualization generation. For each subtask, provide a title, description, dependencies, and detailed implementation requirements.",
+      "reasoning": "This agent requires sophisticated project management capabilities to convert gap assessments into actionable project plans with accurate timelines and resource requirements. It must handle complex dependency mapping and generate visualizations while integrating with project management methodologies."
+    },
+    {
+      "taskId": 8,
+      "taskTitle": "Assessment Dashboard & User Interface",
+      "complexityScore": 8,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Break down the Assessment Dashboard & User Interface task into 7 subtasks covering UI framework setup, document upload interface, real-time analysis visualization, compliance scoring display, gap exploration interface, financial impact visualization, and report generation. For each subtask, provide a title, description, dependencies, and detailed implementation requirements.",
+      "reasoning": "This task involves creating a sophisticated React.js interface with multiple interactive components, real-time updates, data visualization, and report generation capabilities. It must integrate with multiple backend agents and present complex compliance data in an executive-ready format."
+    },
+    {
+      "taskId": 10,
+      "taskTitle": "Document Processing & AI Integration Layer",
+      "complexityScore": 7,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the Document Processing & AI Integration Layer task into 5 subtasks covering document extraction pipeline, AI model integration, prompt engineering, response validation, and multi-format/language support. For each subtask, provide a title, description, dependencies, and detailed implementation requirements.",
+      "reasoning": "This task requires building robust document processing capabilities and integrating with sophisticated AI models. It must handle various document formats, implement structured prompts, validate AI responses, and support multiple languages while ensuring error resilience."
+    },
+    {
+      "taskId": 13,
+      "taskTitle": "ICT Risk Management Agent",
+      "complexityScore": 8,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Break down the ICT Risk Management Agent task into 6 subtasks covering risk discovery mechanisms, vulnerability scanning integration, risk scoring algorithms, enterprise risk management integration, continuous monitoring, and DORA compliance alignment. For each subtask, provide a title, description, dependencies, and detailed implementation requirements.",
+      "reasoning": "This agent requires sophisticated risk assessment capabilities, vulnerability scanning integration, and alignment with complex DORA requirements (Articles 6-15). It must perform continuous risk discovery and integrate with enterprise systems while providing accurate risk scoring."
+    },
+    {
+      "taskId": 14,
+      "taskTitle": "Incident Management & Reporting Agent",
+      "complexityScore": 9,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Break down the Incident Management & Reporting Agent task into 7 subtasks covering incident detection algorithms, classification system, impact assessment, regulatory reporting automation, cross-border coordination, timeline management, and remediation tracking. For each subtask, provide a title, description, dependencies, and detailed implementation requirements.",
+      "reasoning": "This agent must handle real-time incident detection across complex infrastructure, implement sophisticated classification per DORA taxonomies, assess impacts, and automate regulatory reporting within strict timelines. It requires integration with multiple systems and compliance with Articles 17-23."
+    },
+    {
+      "taskId": 15,
+      "taskTitle": "Digital Resilience Testing Agent",
+      "complexityScore": 9,
+      "recommendedSubtasks": 7,
+      "expansionPrompt": "Break down the Digital Resilience Testing Agent task into 7 subtasks covering vulnerability assessment automation, penetration testing orchestration, TLPT coordination, business continuity testing, performance testing, test scenario generation, and remediation tracking. For each subtask, provide a title, description, dependencies, and detailed implementation requirements.",
+      "reasoning": "This agent must orchestrate complex testing activities including vulnerability assessments, penetration testing, and TLPT per Articles 24-27. It requires integration with external red teams, sophisticated test scenario generation, and compliance with multiple testing frameworks including TIBER-EU."
+    },
+    {
+      "taskId": 2,
+      "taskTitle": "Agent Orchestration Platform",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on agent orchestration platform.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 3,
+      "taskTitle": "DORA Requirements Database & Knowledge Base",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on dora requirements database & knowledge base.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 4,
+      "taskTitle": "Policy Analyzer Agent - MVP Core",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on policy analyzer agent - mvp core.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 9,
+      "taskTitle": "Data Management & Storage Layer",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on data management & storage layer.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 11,
+      "taskTitle": "Security Framework Implementation",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on security framework implementation.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 12,
+      "taskTitle": "Assessment Platform MVP Integration",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on assessment platform mvp integration.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 16,
+      "taskTitle": "Third-Party Risk Management Agent",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on third-party risk management agent.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 17,
+      "taskTitle": "Threat Intelligence & Information Sharing Agent",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on threat intelligence & information sharing agent.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 18,
+      "taskTitle": "Operational Compliance Dashboard",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on operational compliance dashboard.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 19,
+      "taskTitle": "Integration Layer Development",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on integration layer development.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 20,
+      "taskTitle": "Agent Communication & Message Queue Setup",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on agent communication & message queue setup.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 21,
+      "taskTitle": "Monitoring & Observability Platform",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on monitoring & observability platform.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 22,
+      "taskTitle": "Regulatory Data Models & Schemas",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on regulatory data models & schemas.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 23,
+      "taskTitle": "Register of Information (RoI) Management",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on register of information (roi) management.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 24,
+      "taskTitle": "TLPT Coordination & Execution",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on tlpt coordination & execution.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 25,
+      "taskTitle": "Cross-Border Incident Coordination",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on cross-border incident coordination.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 26,
+      "taskTitle": "Performance Testing & Load Validation",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on performance testing & load validation.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 27,
+      "taskTitle": "Regulatory Compliance Validation",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on regulatory compliance validation.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    },
+    {
+      "taskId": 28,
+      "taskTitle": "Production Deployment & Cutover",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down this task with a focus on production deployment & cutover.",
+      "reasoning": "Automatically added due to missing analysis in AI response."
+    }
+  ]
+}

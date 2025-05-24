@@ -1,0 +1,138 @@
+# Storage class for high-performance SSD storage (databases)
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: dora-fast-ssd
+  labels:
+    app.kubernetes.io/part-of: dora-compliance
+provisioner: kubernetes.io/aws-ebs  # Change based on cloud provider
+parameters:
+  type: gp3
+  iops: "16000"
+  throughput: "1000"
+  encrypted: "true"
+  fsType: ext4
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+---
+# Storage class for standard SSD storage (general purpose)
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: dora-standard-ssd
+  labels:
+    app.kubernetes.io/part-of: dora-compliance
+provisioner: kubernetes.io/aws-ebs  # Change based on cloud provider
+parameters:
+  type: gp3
+  iops: "3000"
+  throughput: "125"
+  encrypted: "true"
+  fsType: ext4
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+---
+# Storage class for archival/backup storage
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: dora-archive
+  labels:
+    app.kubernetes.io/part-of: dora-compliance
+provisioner: kubernetes.io/aws-ebs  # Change based on cloud provider
+parameters:
+  type: sc1  # Cold HDD
+  encrypted: "true"
+  fsType: ext4
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+---
+# Storage class for shared storage (EFS/NFS)
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: dora-shared
+  labels:
+    app.kubernetes.io/part-of: dora-compliance
+provisioner: efs.csi.aws.com  # AWS EFS example
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: fs-xxxxxxxx  # Replace with actual EFS ID
+  directoryPerms: "700"
+  gidRangeStart: "1000"
+  gidRangeEnd: "2000"
+  basePath: "/dora-shared"
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+---
+# PersistentVolume for pre-provisioned storage (example)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: dora-backup-pv
+  labels:
+    app.kubernetes.io/part-of: dora-compliance
+    type: backup
+spec:
+  capacity:
+    storage: 10Ti
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: dora-archive
+  csi:
+    driver: ebs.csi.aws.com
+    volumeHandle: vol-xxxxxxxx  # Replace with actual volume ID
+    fsType: ext4
+---
+# Volume Snapshot Class for backups
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: dora-snapshot-class
+  labels:
+    app.kubernetes.io/part-of: dora-compliance
+driver: ebs.csi.aws.com
+deletionPolicy: Retain
+parameters:
+  encrypted: "true"
+---
+# Example PVC for database storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data-pvc
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 500Gi
+  storageClassName: dora-fast-ssd
+---
+# Example PVC for shared agent storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: agent-shared-pvc
+  namespace: dora-agents
+  labels:
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: agents
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: dora-shared 

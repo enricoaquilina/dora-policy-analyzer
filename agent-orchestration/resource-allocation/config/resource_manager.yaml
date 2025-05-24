@@ -1,0 +1,279 @@
+# Resource Manager Configuration
+
+# Database Configuration
+database:
+  host: localhost
+  port: 5432
+  database: dora_compliance
+  user: postgres
+  password: password
+  pool_size: 20
+  max_overflow: 30
+
+# Redis Configuration (for caching and distributed state)
+redis:
+  host: localhost
+  port: 6379
+  db: 0
+  password: null
+  pool_size: 10
+
+# Resource Tracking Configuration
+tracking:
+  update_interval: 30  # seconds
+  discovery_mode: "kubernetes"  # "kubernetes" or "local"
+  node_health_timeout: 120  # seconds
+
+# Kubernetes Configuration (if using K8s discovery)
+kubernetes:
+  namespace: "dora-agents"
+  label_selector: "app=dora-agent"
+  custom_resources:
+    - "nvidia.com/gpu"
+    - "memory"
+    - "cpu"
+
+# Allocation Configuration
+allocation:
+  default_algorithm: "priority_with_fairshare"
+  algorithms:
+    - priority_based
+    - fair_share
+    - bin_packing
+    - priority_with_fairshare
+  
+  preemption:
+    enabled: true
+    grace_period: 300  # seconds
+    priority_threshold: 2  # minimum priority difference for preemption
+  
+  backfill:
+    enabled: true
+    max_duration: 3600  # seconds
+    look_ahead: 7200   # seconds
+
+# Quota Configuration
+quotas:
+  enforcement: "strict"  # "strict" or "soft"
+  burst_allowance: 1.5
+  grace_period: 300  # seconds
+  auto_scaling: true
+  
+  # Default limits per agent type
+  defaults:
+    policy_analyzer:
+      cpu: 8
+      memory: 16
+      disk: 100
+      api_quota: 5000
+    
+    gap_assessment:
+      cpu: 4
+      memory: 8
+      disk: 50
+      api_quota: 2000
+    
+    risk_analyzer:
+      cpu: 12
+      memory: 32
+      gpu: 1
+      api_quota: 3000
+    
+    compliance_auditor:
+      cpu: 6
+      memory: 12
+      disk: 200
+      api_quota: 4000
+    
+    data_processor:
+      cpu: 16
+      memory: 64
+      disk: 500
+      db_connections: 50
+
+# Throttling Configuration
+throttling:
+  enabled: true
+  
+  # Resource utilization thresholds
+  thresholds:
+    cpu: 80      # percentage
+    memory: 85   # percentage
+    disk: 90     # percentage
+    network: 75  # percentage
+  
+  # API rate limiting
+  api_limits:
+    openai: 1000      # requests per minute
+    anthropic: 500    # requests per minute
+    external: 2000    # requests per minute
+  
+  # Backpressure settings
+  backpressure:
+    enabled: true
+    base_delay: 1.0    # seconds
+    max_delay: 60.0    # seconds
+    jitter: true
+
+# Resource Pool Configuration
+pools:
+  shared_compute:
+    type: "compute"
+    max_size: 100
+    resources:
+      cpu: 64
+      memory: 256
+      disk: 1000
+  
+  gpu_pool:
+    type: "gpu"
+    max_size: 10
+    resources:
+      gpu: 8
+      memory: 64
+  
+  database_pool:
+    type: "database"
+    max_size: 200
+    resources:
+      db_connections: 200
+
+# Monitoring and Metrics
+monitoring:
+  metrics_port: 8000
+  collection_interval: 60  # seconds
+  retention_period: "7d"
+  
+  # Prometheus configuration
+  prometheus:
+    enabled: true
+    namespace: "dora_resource_manager"
+    labels:
+      service: "resource-allocation"
+      environment: "production"
+  
+  # Health checks
+  health_checks:
+    enabled: true
+    endpoint: "/health"
+    interval: 30  # seconds
+  
+  # Alerting thresholds
+  alerts:
+    high_cpu_utilization: 90
+    high_memory_utilization: 95
+    quota_usage_warning: 80
+    quota_usage_critical: 95
+    allocation_failure_rate: 5  # percentage
+
+# Security Configuration
+security:
+  encryption:
+    enabled: true
+    algorithm: "AES-256-GCM"
+  
+  authentication:
+    enabled: true
+    token_expiry: 3600  # seconds
+  
+  audit_logging:
+    enabled: true
+    log_level: "INFO"
+    include_sensitive: false
+
+# Performance Tuning
+performance:
+  # Connection pooling
+  connection_pools:
+    database:
+      min_size: 5
+      max_size: 20
+      timeout: 30
+    redis:
+      min_size: 2
+      max_size: 10
+      timeout: 10
+  
+  # Caching
+  caching:
+    enabled: true
+    ttl: 300  # seconds
+    max_size: 10000  # entries
+  
+  # Batch processing
+  batching:
+    enabled: true
+    batch_size: 100
+    flush_interval: 5  # seconds
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "json"
+  handlers:
+    - type: "console"
+    - type: "file"
+      filename: "/var/log/resource-manager/resource-manager.log"
+      max_size: "100MB"
+      backup_count: 5
+  
+  # Structured logging fields
+  fields:
+    - timestamp
+    - level
+    - logger
+    - message
+    - correlation_id
+    - agent_id
+    - allocation_id
+
+# Development and Testing
+development:
+  debug: false
+  mock_kubernetes: false
+  simulate_load: false
+  test_mode: false
+  
+  # Load simulation (for testing)
+  simulation:
+    num_agents: 50
+    request_rate: 10  # requests per second
+    duration: 3600    # seconds
+
+# Feature Flags
+features:
+  enable_reservations: true
+  enable_preemption: true
+  enable_auto_scaling: true
+  enable_cost_optimization: true
+  enable_predictive_scaling: false  # experimental
+
+# Environment-specific overrides
+environments:
+  development:
+    database:
+      host: localhost
+      database: dora_compliance_dev
+    logging:
+      level: "DEBUG"
+    monitoring:
+      collection_interval: 10
+  
+  staging:
+    quotas:
+      enforcement: "soft"
+    throttling:
+      thresholds:
+        cpu: 85
+        memory: 90
+  
+  production:
+    security:
+      encryption:
+        enabled: true
+      authentication:
+        enabled: true
+    monitoring:
+      alerts:
+        high_cpu_utilization: 85
+        high_memory_utilization: 90 

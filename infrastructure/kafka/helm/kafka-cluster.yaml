@@ -1,0 +1,348 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: dora-kafka-cluster
+  namespace: dora-system
+  labels:
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  kafka:
+    version: 3.6.0
+    replicas: 3
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        type: internal
+        tls: true
+        authentication:
+          type: scram-sha-256
+      - name: external
+        port: 9094
+        type: nodeport
+        tls: true
+        authentication:
+          type: scram-sha-256
+    authorization:
+      type: simple
+    config:
+      # Replication and durability
+      default.replication.factor: 3
+      min.insync.replicas: 2
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+      
+      # Performance tuning
+      num.network.threads: 8
+      num.io.threads: 16
+      socket.send.buffer.bytes: 102400
+      socket.receive.buffer.bytes: 102400
+      socket.request.max.bytes: 104857600
+      
+      # Log settings
+      log.retention.hours: 168  # 7 days
+      log.retention.bytes: 1073741824  # 1GB
+      log.segment.bytes: 1073741824
+      log.retention.check.interval.ms: 300000
+      log.cleanup.policy: delete
+      
+      # Compression
+      compression.type: snappy
+      
+      # Security
+      security.inter.broker.protocol: SASL_SSL
+      sasl.mechanism.inter.broker.protocol: SCRAM-SHA-256
+      sasl.enabled.mechanisms: SCRAM-SHA-256
+      
+      # Consumer group settings
+      group.initial.rebalance.delay.ms: 3000
+      
+    storage:
+      type: persistent-claim
+      size: 1Ti
+      class: dora-fast-ssd
+      deleteClaim: false
+    
+    resources:
+      requests:
+        memory: "8Gi"
+        cpu: "2"
+      limits:
+        memory: "16Gi"
+        cpu: "4"
+    
+    jvmOptions:
+      -Xms: "4g"
+      -Xmx: "8g"
+      -XX:+UseG1GC:
+      -XX:MaxGCPauseMillis: "20"
+      -XX:InitiatingHeapOccupancyPercent: "35"
+      -XX:+ExplicitGCInvokesConcurrent:
+      
+    metrics:
+      lowercaseOutputName: true
+      rules:
+      - pattern: kafka.server<type=(.+), name=(.+), clientId=(.+), topic=(.+), partition=(.*)><>Value
+        name: kafka_server_$1_$2
+        type: GAUGE
+        labels:
+          clientId: "$3"
+          topic: "$4"
+          partition: "$5"
+      - pattern: kafka.server<type=(.+), name=(.+), clientId=(.+), brokerHost=(.+), brokerPort=(.+)><>Value
+        name: kafka_server_$1_$2
+        type: GAUGE
+        labels:
+          clientId: "$3"
+          broker: "$4:$5"
+    
+    template:
+      pod:
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: strimzi.io/name
+                  operator: In
+                  values:
+                  - dora-kafka-cluster-kafka
+              topologyKey: kubernetes.io/hostname
+        tolerations:
+        - key: "data"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+        nodeSelector:
+          role: data
+          
+      persistentVolumeClaim:
+        metadata:
+          labels:
+            app.kubernetes.io/name: kafka-storage
+            app.kubernetes.io/part-of: dora-compliance
+
+  zookeeper:
+    replicas: 3
+    storage:
+      type: persistent-claim
+      size: 100Gi
+      class: dora-standard-ssd
+      deleteClaim: false
+    
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "500m"
+      limits:
+        memory: "4Gi"
+        cpu: "1"
+    
+    jvmOptions:
+      -Xms: "1g"
+      -Xmx: "2g"
+      
+    metrics:
+      lowercaseOutputName: true
+      
+    template:
+      pod:
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: strimzi.io/name
+                  operator: In
+                  values:
+                  - dora-kafka-cluster-zookeeper
+              topologyKey: kubernetes.io/hostname
+        tolerations:
+        - key: "data"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+        nodeSelector:
+          role: data
+
+  entityOperator:
+    topicOperator:
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "200m"
+        limits:
+          memory: "1Gi"
+          cpu: "500m"
+    userOperator:
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "200m"
+        limits:
+          memory: "1Gi"
+          cpu: "500m"
+
+  kafkaExporter:
+    groupRegex: ".*"
+    topicRegex: ".*"
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "100m"
+      limits:
+        memory: "128Mi"
+        cpu: "200m"
+
+---
+# Kafka Users for authentication
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: dora-admin
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+spec:
+  authentication:
+    type: scram-sha-256
+  authorization:
+    type: simple
+    acls:
+    - resource:
+        type: cluster
+      operation: All
+    - resource:
+        type: topic
+        name: "*"
+      operation: All
+    - resource:
+        type: group
+        name: "*"
+      operation: All
+
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: dora-agent-user
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+spec:
+  authentication:
+    type: scram-sha-256
+  authorization:
+    type: simple
+    acls:
+    # Agent topics
+    - resource:
+        type: topic
+        name: agent-events
+      operation: Write
+    - resource:
+        type: topic
+        name: task-requests
+      operation: Read
+    - resource:
+        type: topic
+        name: task-responses
+      operation: Write
+    # Consumer groups
+    - resource:
+        type: group
+        name: agent-*
+      operation: All
+
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: dora-orchestrator-user
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+spec:
+  authentication:
+    type: scram-sha-256
+  authorization:
+    type: simple
+    acls:
+    # Orchestrator topics
+    - resource:
+        type: topic
+        name: task-requests
+      operation: Write
+    - resource:
+        type: topic
+        name: task-responses
+      operation: Read
+    - resource:
+        type: topic
+        name: agent-events
+      operation: Read
+    # Consumer groups
+    - resource:
+        type: group
+        name: orchestrator-*
+      operation: All
+
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: dora-audit-user
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+spec:
+  authentication:
+    type: scram-sha-256
+  authorization:
+    type: simple
+    acls:
+    # Audit topics
+    - resource:
+        type: topic
+        name: audit-logs
+      operation: Write
+    - resource:
+        type: topic
+        name: user-activities
+      operation: Write
+    - resource:
+        type: topic
+        name: data-access
+      operation: Write
+    # Consumer groups
+    - resource:
+        type: group
+        name: audit-*
+      operation: All
+
+---
+# Service to expose Kafka
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-bootstrap
+  namespace: dora-system
+  labels:
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  type: ClusterIP
+  ports:
+  - name: kafka-plain
+    port: 9092
+    targetPort: 9092
+  - name: kafka-tls
+    port: 9093
+    targetPort: 9093
+  selector:
+    strimzi.io/name: dora-kafka-cluster-kafka 

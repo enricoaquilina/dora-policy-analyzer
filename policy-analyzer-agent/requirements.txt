@@ -1,0 +1,143 @@
+# Policy Analyzer Agent Requirements
+# Document processing, NLP, and AI model dependencies for MVP
+
+# Core framework
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.0.0
+
+# Document processing
+PyMuPDF>=1.23.0  # PDF processing (fitz)
+python-docx>=1.1.0  # DOCX processing
+pytesseract>=0.3.10  # OCR capabilities
+Pillow>=10.0.0  # Image processing
+beautifulsoup4>=4.12.0  # HTML processing
+lxml>=4.9.0  # XML/HTML parser
+
+# Text processing and NLP
+nltk>=3.8.1
+spacy>=3.7.0
+transformers>=4.30.0  # Hugging Face models
+torch>=2.0.0  # PyTorch for ML models
+sentence-transformers>=2.2.0  # Sentence embeddings
+
+# AI model integrations
+anthropic>=0.7.0  # Claude API
+openai>=1.3.0  # OpenAI API
+requests>=2.31.0  # HTTP requests for APIs
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+
+# Database and storage
+sqlalchemy>=2.0.0
+asyncpg>=0.29.0
+redis>=5.0.0
+
+# Configuration and utilities
+python-dotenv>=1.0.0
+pyyaml>=6.0.0
+click>=8.1.0
+typer>=0.9.0
+
+# Progress and logging
+tqdm>=4.66.0
+structlog>=23.1.0
+rich>=13.5.0
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+httpx>=0.25.0
+
+# Development tools
+black>=23.9.0
+isort>=5.12.0
+mypy>=1.6.0
+
+# Additional utilities
+python-dateutil>=2.8.0
+jsonschema>=4.19.0
+markdown>=3.5.0
+
+# Core NLP and AI dependencies
+anthropic>=0.21.3
+openai>=1.12.0
+google-generativeai>=0.5.4
+transformers>=4.35.0
+torch>=2.1.0
+sentence-transformers>=2.2.2
+spacy>=3.7.0
+nltk>=3.8.1
+
+# Document processing
+PyPDF2>=3.0.1
+python-docx>=0.8.11
+pdfplumber>=0.9.0
+pymupdf>=1.23.0
+python-pptx>=0.6.21
+Pillow>=10.0.0
+pytesseract>=0.3.10
+pdfminer.six>=20221105
+
+# Data processing and analysis
+pandas>=2.1.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Web framework and interface
+Flask>=3.0.0
+Flask-SocketIO>=5.3.6
+Werkzeug>=3.0.1
+Jinja2>=3.1.2
+eventlet>=0.35.2
+
+# HTTP and API
+requests>=2.31.0
+httpx>=0.25.0
+aiohttp>=3.9.0
+
+# Configuration and environment
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# Async and concurrency
+asyncio-throttle>=1.0.2
+
+# Utilities
+rich>=13.6.0
+click>=8.1.0
+python-dateutil>=2.8.2
+pytz>=2023.3
+
+# Development and testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+black>=23.9.0
+flake8>=6.1.0
+
+# Security
+cryptography>=41.0.0
+
+# File handling
+chardet>=5.2.0
+pathlib>=1.0.1
+
+# Monitoring and logging
+structlog>=23.2.0
+loguru>=0.7.2
+
+# JSON processing
+jsonschema>=4.19.0
+
+# Markdown processing
+markdown>=3.5.0
+
+# Optional: For enhanced document processing
+textract>=1.6.5
+unstructured>=0.10.0 

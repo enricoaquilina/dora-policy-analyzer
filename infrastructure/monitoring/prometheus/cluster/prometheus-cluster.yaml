@@ -1,0 +1,463 @@
+# Prometheus Cluster Configuration for DORA Compliance System
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: dora-prometheus
+  namespace: dora-monitoring
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: metrics
+spec:
+  # High availability configuration
+  replicas: 3
+  shards: 1
+  
+  # Image configuration
+  image: quay.io/prometheus/prometheus:v2.48.1
+  version: v2.48.1
+  
+  # Resource allocation
+  resources:
+    requests:
+      cpu: "2"
+      memory: "4Gi"
+    limits:
+      cpu: "4"
+      memory: "8Gi"
+  
+  # Storage configuration
+  storage:
+    volumeClaimTemplate:
+      metadata:
+        name: prometheus-storage
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        storageClassName: dora-fast-ssd
+        resources:
+          requests:
+            storage: 1Ti
+  
+  # Data retention
+  retention: 15d
+  retentionSize: 800GB
+  
+  # Service account
+  serviceAccountName: prometheus-operator
+  
+  # Security context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    fsGroup: 2000
+  
+  # Node placement
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: prometheus
+        topologyKey: kubernetes.io/hostname
+  
+  nodeSelector:
+    role: monitoring
+  
+  tolerations:
+  - key: "monitoring"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+  
+  # Configuration
+  scrapeInterval: 30s
+  scrapeTimeout: 10s
+  evaluationInterval: 30s
+  
+  # External labels for federation and Thanos
+  externalLabels:
+    cluster: dora-main
+    environment: production
+    region: us-west-2
+  
+  # Rule selectors
+  ruleSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: dora-compliance
+      prometheus: dora-prometheus
+  
+  # ServiceMonitor selectors
+  serviceMonitorSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: dora-compliance
+  
+  # PodMonitor selectors
+  podMonitorSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: dora-compliance
+  
+  # Probe selectors
+  probeSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: dora-compliance
+  
+  # Additional scrape configs
+  additionalScrapeConfigs:
+    name: additional-scrape-configs
+    key: prometheus-additional.yaml
+  
+  # Remote write for Thanos
+  remoteWrite:
+  - url: http://thanos-receive.dora-monitoring.svc.cluster.local:19291/api/v1/receive
+    name: thanos-receive
+    writeRelabelConfigs:
+    - sourceLabels: [__name__]
+      regex: "node_.*|kube_.*|prometheus_.*|alertmanager_.*|dora_.*"
+      action: keep
+    queueConfig:
+      capacity: 10000
+      maxSamplesPerSend: 5000
+      batchSendDeadline: 5s
+      minBackoff: 30ms
+      maxBackoff: 100ms
+  
+  # Alerting configuration
+  alerting:
+    alertmanagers:
+    - namespace: dora-monitoring
+      name: alertmanager-main
+      port: web
+      pathPrefix: /
+  
+  # Web configuration
+  web:
+    pageTitle: "DORA Compliance - Prometheus"
+    maxConnections: 512
+  
+  # Thanos sidecar for long-term storage
+  thanos:
+    image: quay.io/thanos/thanos:v0.32.5
+    version: v0.32.5
+    
+    # Object storage configuration
+    objectStorageConfig:
+      name: thanos-objstore-secret
+      key: objstore.yml
+    
+    # Resources for Thanos sidecar
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    
+    # Log level
+    logLevel: info
+    
+    # Min time for blocks
+    minTime: -1h
+  
+  # Prometheus configuration overrides
+  prometheusSpec:
+    # WAL compression
+    walCompression: true
+    
+    # Query configuration
+    query:
+      maxConcurrency: 20
+      timeout: 2m
+      maxSamples: 50000000
+    
+    # Feature flags
+    enableFeatures:
+    - exemplar-storage
+    - memory-snapshot-on-shutdown
+    
+    # Additional command line arguments
+    additionalArgs:
+    - --web.enable-lifecycle
+    - --web.enable-admin-api
+    - --storage.tsdb.wal-compression
+    - --storage.tsdb.retention.size=800GB
+    - --storage.tsdb.head-chunks-write-queue-size=10000
+
+---
+# ServiceAccount for Prometheus
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus-operator
+  namespace: dora-monitoring
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: dora-compliance
+
+---
+# ClusterRole for Prometheus
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus-operator
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: dora-compliance
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - nodes/proxy
+  - services
+  - endpoints
+  - pods
+  - configmaps
+  - secrets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["extensions", "apps"]
+  resources:
+  - deployments
+  - daemonsets
+  - replicasets
+  - statefulsets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["networking.k8s.io"]
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+  verbs: ["get"]
+
+---
+# ClusterRoleBinding for Prometheus
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus-operator
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: dora-compliance
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus-operator
+subjects:
+- kind: ServiceAccount
+  name: prometheus-operator
+  namespace: dora-monitoring
+
+---
+# Additional scrape configuration
+apiVersion: v1
+kind: Secret
+metadata:
+  name: additional-scrape-configs
+  namespace: dora-monitoring
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: dora-compliance
+type: Opaque
+stringData:
+  prometheus-additional.yaml: |
+    # Additional static scrape configs
+    - job_name: 'kubernetes-apiservers'
+      kubernetes_sd_configs:
+      - role: endpoints
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: default;kubernetes;https
+    
+    # Kubernetes controller manager
+    - job_name: 'kubernetes-controller-manager'
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: kube-controller-manager
+    
+    # Kubernetes scheduler
+    - job_name: 'kubernetes-scheduler'
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: kube-scheduler
+    
+    # External services monitoring
+    - job_name: 'blackbox'
+      metrics_path: /probe
+      params:
+        module: [http_2xx]
+      static_configs:
+      - targets:
+        - https://api.example.com/health
+        - https://external-service.com/status
+      relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter.dora-monitoring.svc.cluster.local:9115
+
+---
+# Thanos object storage secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: thanos-objstore-secret
+  namespace: dora-monitoring
+  labels:
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/part-of: dora-compliance
+type: Opaque
+stringData:
+  objstore.yml: |
+    type: S3
+    config:
+      bucket: dora-thanos-storage
+      endpoint: s3.us-west-2.amazonaws.com
+      access_key: ""  # Will be provided via IRSA
+      secret_key: ""  # Will be provided via IRSA
+      insecure: false
+      signature_version2: false
+      encrypt_sse: true
+      put_user_metadata: {}
+      http_config:
+        idle_conn_timeout: 90s
+        response_header_timeout: 2m
+        insecure_skip_verify: false
+      trace:
+        enable: false
+      part_size: 134217728  # 128MB
+
+---
+# Service for Prometheus
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-service
+  namespace: dora-monitoring
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  type: ClusterIP
+  ports:
+  - name: web
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: prometheus
+
+---
+# ServiceMonitor for Prometheus itself
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: prometheus-self
+  namespace: dora-monitoring
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus
+  endpoints:
+  - port: web
+    interval: 30s
+    path: /metrics
+    scheme: http
+
+---
+# PodDisruptionBudget for Prometheus
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: prometheus-pdb
+  namespace: dora-monitoring
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus
+
+---
+# NetworkPolicy for Prometheus
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prometheus-network-policy
+  namespace: dora-monitoring
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow access from Grafana
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: grafana
+    ports:
+    - protocol: TCP
+      port: 9090
+  # Allow access from Thanos Query
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: thanos-query
+    ports:
+    - protocol: TCP
+      port: 9090
+  egress:
+  # Allow scraping from all namespaces
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 9090
+    - protocol: TCP
+      port: 9100
+    - protocol: TCP
+      port: 9187
+    - protocol: TCP
+      port: 9121
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  # Allow Kubernetes API access
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 6443 

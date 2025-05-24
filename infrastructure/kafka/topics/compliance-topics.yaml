@@ -1,0 +1,240 @@
+# Policy Analysis Topic - Policy document analysis results
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: policy-analysis
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: compliance-data
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 7776000000  # 90 days - compliance data retention
+    segment.ms: 86400000      # 1 day
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 104857600  # 100MB - large analysis reports
+
+---
+# Gap Assessment Topic - Compliance gap identification
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: gap-assessments
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: compliance-data
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 7776000000  # 90 days
+    segment.ms: 86400000      # 1 day
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 52428800  # 50MB
+
+---
+# Risk Assessments Topic - Risk calculation results
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: risk-assessments
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: compliance-data
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 15552000000  # 180 days - longer retention for risk data
+    segment.ms: 86400000       # 1 day
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 52428800  # 50MB
+
+---
+# Compliance Reports Topic - Generated compliance reports
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: compliance-reports
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: compliance-reports
+spec:
+  partitions: 6
+  replicas: 3
+  config:
+    retention.ms: 31536000000  # 365 days - annual retention for reports
+    segment.ms: 86400000       # 1 day
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 104857600  # 100MB - large reports
+
+---
+# Policy Updates Topic - Policy document changes
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: policy-updates
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: policy-management
+spec:
+  partitions: 6
+  replicas: 3
+  config:
+    retention.ms: 31536000000  # 365 days - policy change history
+    segment.ms: 86400000       # 1 day
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 104857600  # 100MB - policy documents
+
+---
+# ICT Incident Events Topic - ICT incident notifications
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: ict-incident-events
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: incident-management
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 94608000000  # 3 years - regulatory requirement
+    segment.ms: 86400000       # 1 day
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 52428800  # 50MB
+
+---
+# Third Party Risk Events Topic - Vendor risk assessments
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: third-party-risk-events
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: third-party-management
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 15552000000  # 180 days
+    segment.ms: 86400000       # 1 day
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 52428800  # 50MB
+
+---
+# Resilience Testing Events Topic - TLPT and testing results
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: resilience-testing-events
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: testing-management
+spec:
+  partitions: 6
+  replicas: 3
+  config:
+    retention.ms: 31536000000  # 365 days - testing history
+    segment.ms: 86400000       # 1 day
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 104857600  # 100MB - test reports
+
+---
+# Threat Intelligence Events Topic - Cyber threat information
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: threat-intelligence-events
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: threat-intelligence
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 2592000000  # 30 days - threat data is time-sensitive
+    segment.ms: 3600000       # 1 hour - frequent segments for freshness
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 10485760  # 10MB
+
+---
+# Implementation Planning Events Topic - Roadmap and planning data
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: implementation-planning-events
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: planning-management
+spec:
+  partitions: 6
+  replicas: 3
+  config:
+    retention.ms: 15552000000  # 180 days
+    segment.ms: 86400000       # 1 day
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 52428800  # 50MB
+
+---
+# Compliance State Topic - Current compliance status (compacted)
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: compliance-state
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: state-management
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    cleanup.policy: compact
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 10485760  # 10MB
+    segment.ms: 86400000         # 1 day
+    min.cleanable.dirty.ratio: 0.1 

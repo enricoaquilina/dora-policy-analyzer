@@ -1,0 +1,152 @@
+# Agent Events Topic - Agent lifecycle and status updates
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: agent-events
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: agent-communication
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 604800000  # 7 days
+    segment.ms: 86400000     # 1 day
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 1048576  # 1MB
+
+---
+# Task Requests Topic - Task assignment and execution requests
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: task-requests
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: agent-communication
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 2592000000  # 30 days
+    segment.ms: 86400000      # 1 day
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 10485760  # 10MB - larger for task payloads
+
+---
+# Task Responses Topic - Task completion and result responses
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: task-responses
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: agent-communication
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 2592000000  # 30 days
+    segment.ms: 86400000      # 1 day
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 52428800  # 50MB - larger for analysis results
+
+---
+# Agent Heartbeat Topic - Health monitoring
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: agent-heartbeat
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: agent-monitoring
+spec:
+  partitions: 6
+  replicas: 3
+  config:
+    retention.ms: 86400000    # 1 day
+    segment.ms: 3600000       # 1 hour
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 1024   # Small heartbeat messages
+
+---
+# Agent Metrics Topic - Performance and utilization metrics
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: agent-metrics
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: agent-monitoring
+spec:
+  partitions: 12
+  replicas: 3
+  config:
+    retention.ms: 604800000   # 7 days
+    segment.ms: 3600000       # 1 hour
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 10240  # Small metric messages
+
+---
+# Agent Configuration Topic - Configuration updates (compacted)
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: agent-config
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: agent-configuration
+spec:
+  partitions: 6
+  replicas: 3
+  config:
+    cleanup.policy: compact
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 1048576  # 1MB for configuration
+    segment.ms: 86400000        # 1 day
+    min.cleanable.dirty.ratio: 0.1
+
+---
+# Dead Letter Queue for Agent Topics
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: agent-dlq
+  namespace: dora-system
+  labels:
+    strimzi.io/cluster: dora-kafka-cluster
+    app.kubernetes.io/part-of: dora-compliance
+    topic.type: dead-letter-queue
+spec:
+  partitions: 6
+  replicas: 3
+  config:
+    retention.ms: 2592000000  # 30 days - retain errors longer
+    segment.ms: 86400000      # 1 day
+    cleanup.policy: delete
+    compression.type: snappy
+    min.insync.replicas: 2
+    max.message.bytes: 52428800  # 50MB - preserve original failed messages 

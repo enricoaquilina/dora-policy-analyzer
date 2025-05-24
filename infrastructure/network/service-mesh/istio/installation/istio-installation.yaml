@@ -1,0 +1,518 @@
+# Istio Service Mesh Installation Configuration for DORA Compliance System
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: dora-istio-control-plane
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/name: istio
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: service-mesh
+spec:
+  # Istio revision for canary deployments
+  revision: "1-20-1"
+  
+  # Global mesh configuration
+  meshConfig:
+    # Access logging for compliance
+    accessLogFile: /dev/stdout
+    accessLogFormat: |
+      {
+        "timestamp": "%START_TIME%",
+        "method": "%REQ(:METHOD)%",
+        "url": "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%",
+        "protocol": "%PROTOCOL%",
+        "response_code": "%RESPONSE_CODE%",
+        "response_flags": "%RESPONSE_FLAGS%",
+        "bytes_received": "%BYTES_RECEIVED%",
+        "bytes_sent": "%BYTES_SENT%",
+        "duration": "%DURATION%",
+        "upstream_service_time": "%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%",
+        "x_forwarded_for": "%REQ(X-FORWARDED-FOR)%",
+        "user_agent": "%REQ(USER-AGENT)%",
+        "request_id": "%REQ(X-REQUEST-ID)%",
+        "authority": "%REQ(:AUTHORITY)%",
+        "upstream_host": "%UPSTREAM_HOST%",
+        "upstream_cluster": "%UPSTREAM_CLUSTER%",
+        "upstream_local_address": "%UPSTREAM_LOCAL_ADDRESS%",
+        "downstream_local_address": "%DOWNSTREAM_LOCAL_ADDRESS%",
+        "downstream_remote_address": "%DOWNSTREAM_REMOTE_ADDRESS%",
+        "requested_server_name": "%REQUESTED_SERVER_NAME%",
+        "route_name": "%ROUTE_NAME%"
+      }
+    
+    # Default configuration for all proxies
+    defaultConfig:
+      # Telemetry v2 configuration
+      proxyStatsMatcher:
+        inclusion_regexps:
+        - ".*outlier_detection.*"
+        - ".*circuit_breakers.*"
+        - ".*upstream_rq_retry.*"
+        - ".*upstream_rq_pending.*"
+        - ".*_cx_.*"
+        exclusion_regexps:
+        - ".*osconfig.*"
+      
+      # Proxy resource allocation
+      proxyMetadata:
+        PILOT_ENABLE_IP_AUTOALLOCATE: true
+        PILOT_ENABLE_CROSS_CLUSTER_WORKLOAD_ENTRY: true
+        BOOTSTRAP_XDS_AGENT: true
+      
+      # Concurrency settings
+      concurrency: 2
+      
+      # Tracing configuration
+      tracing:
+        sampling: 1.0  # 100% sampling for compliance
+        custom_tags:
+          compliance_id:
+            header:
+              name: "x-compliance-id"
+          user_id:
+            header:
+              name: "x-user-id"
+          session_id:
+            header:
+              name: "x-session-id"
+    
+    # Security settings
+    defaultProviders:
+      metrics:
+      - prometheus
+      tracing:
+      - jaeger
+      accessLogging:
+      - envoy
+    
+    # Extension providers
+    extensionProviders:
+    - name: prometheus
+      prometheus:
+        configOverride:
+          metric_relabeling_configs:
+          - source_labels: [__name__]
+            regex: 'istio_.*'
+            target_label: component
+            replacement: 'istio-proxy'
+    
+    - name: jaeger
+      envoyOtelAls:
+        service: jaeger-collector.dora-monitoring.svc.cluster.local
+        port: 14250
+    
+    - name: otel
+      envoyOtelAls:
+        service: opentelemetry-collector.dora-monitoring.svc.cluster.local
+        port: 4317
+
+  # Component configuration
+  components:
+    # Pilot (Istiod) configuration
+    pilot:
+      k8s:
+        env:
+        # Enable various features
+        - name: PILOT_ENABLE_WORKLOAD_ENTRY_AUTOREGISTRATION
+          value: "true"
+        - name: PILOT_ENABLE_CROSS_CLUSTER_WORKLOAD_ENTRY
+          value: "true"
+        - name: PILOT_TRACE_SAMPLING
+          value: "100.0"
+        - name: PILOT_ENABLE_STATUS
+          value: "true"
+        - name: PILOT_ENABLE_ALPN_FILTER
+          value: "true"
+        
+        # Resource allocation
+        resources:
+          requests:
+            cpu: 500m
+            memory: 2048Mi
+          limits:
+            cpu: 1000m
+            memory: 4096Mi
+        
+        # High availability
+        replicaCount: 3
+        
+        # Node placement
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: istiod
+              topologyKey: kubernetes.io/hostname
+        
+        nodeSelector:
+          role: system
+        
+        tolerations:
+        - key: "system"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+        
+        # Pod disruption budget
+        podDisruptionBudget:
+          minAvailable: 2
+        
+        # Security context
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1337
+          runAsGroup: 1337
+          fsGroup: 1337
+
+    # Ingress gateway configuration
+    ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
+      k8s:
+        # Resource allocation
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 2000m
+            memory: 1024Mi
+        
+        # High availability
+        replicaCount: 3
+        
+        # Service configuration
+        service:
+          type: LoadBalancer
+          ports:
+          - port: 15021
+            targetPort: 15021
+            name: status-port
+            protocol: TCP
+          - port: 80
+            targetPort: 8080
+            name: http2
+            protocol: TCP
+          - port: 443
+            targetPort: 8443
+            name: https
+            protocol: TCP
+          - port: 15443
+            targetPort: 15443
+            name: tls
+            protocol: TCP
+          
+          # AWS Load Balancer annotations
+          annotations:
+            service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+            service.beta.kubernetes.io/aws-load-balancer-internal: "false"
+            service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+            service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
+            service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "3600"
+            service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-public-1,subnet-public-2,subnet-public-3"
+        
+        # Node placement
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: istio-ingressgateway
+              topologyKey: kubernetes.io/hostname
+        
+        nodeSelector:
+          role: gateway
+        
+        tolerations:
+        - key: "gateway"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+        
+        # Horizontal Pod Autoscaler
+        hpaSpec:
+          minReplicas: 3
+          maxReplicas: 10
+          metrics:
+          - type: Resource
+            resource:
+              name: cpu
+              target:
+                type: Utilization
+                averageUtilization: 80
+          - type: Resource
+            resource:
+              name: memory
+              target:
+                type: Utilization
+                averageUtilization: 80
+
+    # Egress gateway for external traffic control
+    egressGateways:
+    - name: istio-egressgateway
+      enabled: true
+      k8s:
+        # Resource allocation
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        
+        # Moderate availability
+        replicaCount: 2
+        
+        # Service configuration
+        service:
+          type: ClusterIP
+          ports:
+          - port: 80
+            name: http2
+            protocol: TCP
+          - port: 443
+            name: https
+            protocol: TCP
+        
+        # Node placement
+        nodeSelector:
+          role: gateway
+        
+        tolerations:
+        - key: "gateway"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+
+  # Global values
+  values:
+    # Global settings
+    global:
+      # Mesh ID for multi-cluster scenarios
+      meshID: dora-main
+      
+      # Multi-cluster settings
+      network: dora-network
+      
+      # Proxy configuration
+      proxy:
+        # Resource allocation for sidecars
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        
+        # Lifecycle configuration
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - "/bin/sh"
+              - "-c"
+              - "sleep 15"
+        
+        # Readiness probe
+        readinessProbe:
+          httpGet:
+            path: /healthz/ready
+            port: 15021
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        # Security context
+        runAsUser: 1337
+        runAsGroup: 1337
+      
+      # Logging configuration
+      logging:
+        level: "default:info,ads:debug,xds:debug"
+      
+      # Image configuration
+      hub: docker.io/istio
+      tag: 1.20.1
+      
+      # Pull policy
+      imagePullPolicy: IfNotPresent
+      
+      # Platform-specific settings
+      platform: "k8s"
+      
+      # Proxy init configuration
+      proxy_init:
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 1024Mi
+          requests:
+            cpu: 10m
+            memory: 10Mi
+      
+      # Istio CNI (if enabled)
+      cni:
+        enabled: false
+      
+      # Pilot configuration
+      pilot:
+        env:
+          EXTERNAL_ISTIOD: false
+          PILOT_ENABLE_IP_AUTOALLOCATE: true
+
+---
+# Namespace for Istio system components
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+  labels:
+    name: istio-system
+    app.kubernetes.io/name: istio-system
+    app.kubernetes.io/part-of: dora-compliance
+    istio-injection: disabled
+
+---
+# PeerAuthentication for strict mTLS across the mesh
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/name: istio
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  mtls:
+    mode: STRICT
+
+---
+# AuthorizationPolicy for default deny-all
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: deny-all
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/name: istio
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  # Empty rules mean deny all
+
+---
+# ServiceMonitor for Istio Control Plane
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: istio-control-plane
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/name: istio
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  selector:
+    matchLabels:
+      app: istiod
+  endpoints:
+  - port: http-monitoring
+    interval: 30s
+    path: /stats/prometheus
+
+---
+# ServiceMonitor for Istio Proxy
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: istio-proxy
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/name: istio
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  selector:
+    matchExpressions:
+    - key: security.istio.io/tlsMode
+      operator: Exists
+  endpoints:
+  - port: http-envoy-prom
+    interval: 30s
+    path: /stats/prometheus
+    relabelings:
+    - sourceLabels: [__meta_kubernetes_pod_name]
+      targetLabel: pod_name
+    - sourceLabels: [__meta_kubernetes_namespace]
+      targetLabel: namespace
+
+---
+# NetworkPolicy for Istio System
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: istio-system-network-policy
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/name: istio
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow webhook traffic from API server
+  - from:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 15017
+  # Allow discovery traffic
+  - from:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 15010
+  # Allow monitoring traffic
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: dora-monitoring
+    ports:
+    - protocol: TCP
+      port: 15014
+  egress:
+  # Allow all egress for control plane operations
+  - {}
+
+---
+# Telemetry configuration for compliance
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: default
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/name: istio
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  metrics:
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        metric: ALL_METRICS
+      tagOverrides:
+        compliance_tenant:
+          value: "dora-main"
+        environment:
+          value: "production"
+  tracing:
+  - providers:
+    - name: jaeger
+  accessLogging:
+  - providers:
+    - name: envoy 

@@ -1,0 +1,615 @@
+{% extends "base.html" %}
+
+{% block title %}Compliance Dashboard - DORA Policy Analyzer{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="d-flex justify-content-center align-items-center" style="height: 70vh;">
+        <div class="text-center">
+            <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"></div>
+            <h4>Loading Analysis Results...</h4>
+            <p class="text-muted">Please wait while we prepare your compliance dashboard</p>
+        </div>
+    </div>
+
+    <!-- Main Dashboard (Hidden initially) -->
+    <div id="main-dashboard" class="d-none">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h1 class="display-6 fw-bold text-primary mb-2">
+                                    <i class="fas fa-chart-pie me-3"></i>
+                                    DORA Compliance Analysis
+                                </h1>
+                                <p class="lead mb-0">
+                                    <strong id="document-title">Document Analysis</strong> • 
+                                    <span id="analysis-date" class="text-muted"></span>
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <div class="d-flex justify-content-md-end gap-2 flex-wrap">
+                                    <button class="btn btn-outline-primary" onclick="exportReport()">
+                                        <i class="fas fa-download me-2"></i>Export Report
+                                    </button>
+                                    <a href="{{ url_for('upload_page') }}" class="btn btn-primary">
+                                        <i class="fas fa-upload me-2"></i>Analyze New Document
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="metric-card h-100">
+                    <div id="overall-score" class="metric-value">--</div>
+                    <div class="metric-label">Overall Compliance</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card h-100">
+                    <div id="rag-status" class="metric-value">--</div>
+                    <div class="metric-label">RAG Status</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card h-100">
+                    <div id="critical-gaps" class="metric-value text-danger">--</div>
+                    <div class="metric-label">Critical Gaps</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card h-100">
+                    <div id="processing-time" class="metric-value text-primary">--</div>
+                    <div class="metric-label">Processing Time</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <!-- Pillar Scores Chart -->
+            <div class="col-lg-8">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            DORA Pillar Assessment
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="pillar-chart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compliance Overview -->
+            <div class="col-lg-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-pie-chart me-2"></i>
+                            Compliance Breakdown
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="compliance-chart" width="200" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pillar Details -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-columns me-2"></i>
+                            Detailed Pillar Assessment
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="pillar-details">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Critical & High Priority Gaps -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Priority Gaps Requiring Immediate Attention
+                        </h5>
+                        <div class="btn-group" role="group" aria-label="Gap filter">
+                            <button type="button" class="btn btn-outline-primary btn-sm active" onclick="filterGaps('all')">All</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="filterGaps('CRITICAL')">Critical</button>
+                            <button type="button" class="btn btn-outline-warning btn-sm" onclick="filterGaps('HIGH')">High</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Article</th>
+                                        <th>Gap Description</th>
+                                        <th>Severity</th>
+                                        <th>Timeline</th>
+                                        <th>Investment</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gaps-table">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Remediation Roadmap -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-road me-2"></i>
+                            Remediation Roadmap
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="roadmap-content">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-tie me-2"></i>
+                            Executive Summary
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="executive-summary" class="lead">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gap Detail Modal -->
+<div class="modal fade" id="gapModal" tabindex="-1" aria-labelledby="gapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="gapModalLabel">Gap Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="gap-modal-body">
+                <!-- Populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Export Gap Details</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pillar-card {
+        border-left: 5px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+    
+    .pillar-card.status-green {
+        border-left-color: #28a745;
+    }
+    
+    .pillar-card.status-amber {
+        border-left-color: #ffc107;
+    }
+    
+    .pillar-card.status-red {
+        border-left-color: #dc3545;
+    }
+    
+    .pillar-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .gap-row.critical {
+        background: rgba(220, 53, 69, 0.05);
+    }
+    
+    .gap-row.high {
+        background: rgba(255, 193, 7, 0.05);
+    }
+    
+    .roadmap-phase {
+        border-left: 4px solid var(--primary-color);
+        padding-left: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .phase-critical {
+        border-left-color: #dc3545;
+    }
+    
+    .phase-high {
+        border-left-color: #ffc107;
+    }
+    
+    .phase-medium {
+        border-left-color: #17a2b8;
+    }
+    
+    .metric-trend {
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+    }
+    
+    .trend-up {
+        color: #28a745;
+    }
+    
+    .trend-down {
+        color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let analysisData = null;
+    let pillarChart = null;
+    let complianceChart = null;
+    let currentGapFilter = 'all';
+
+    // Load analysis data
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            // Get analysis ID from URL
+            const analysisId = window.location.pathname.split('/').pop();
+            
+            // Try to load from localStorage first (for demo)
+            const demoData = localStorage.getItem('demoData');
+            if (demoData && analysisId === 'demo-001') {
+                analysisData = JSON.parse(demoData);
+                renderDashboard();
+            } else {
+                // Load from API
+                const response = await fetch(`/api/result/${analysisId}`);
+                if (response.ok) {
+                    analysisData = await response.json();
+                    renderDashboard();
+                } else {
+                    throw new Error('Analysis not found');
+                }
+            }
+        } catch (error) {
+            console.error('Error loading analysis:', error);
+            showAlert('Error loading analysis results. Redirecting to home...', 'danger');
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 3000);
+        }
+    });
+
+    function renderDashboard() {
+        // Hide loading screen
+        document.getElementById('loading-screen').classList.add('d-none');
+        document.getElementById('main-dashboard').classList.remove('d-none');
+
+        // Populate basic info
+        document.getElementById('document-title').textContent = analysisData.document_title;
+        document.getElementById('analysis-date').textContent = new Date(analysisData.analysis_date).toLocaleDateString();
+
+        // Populate metrics
+        document.getElementById('overall-score').textContent = formatPercentage(analysisData.overall_compliance);
+        document.getElementById('overall-score').className = `metric-value ${getRAGStatusClass(analysisData.rag_status)}`;
+        
+        document.getElementById('rag-status').textContent = analysisData.rag_status;
+        document.getElementById('rag-status').className = `metric-value ${getRAGStatusClass(analysisData.rag_status)}`;
+        
+        document.getElementById('critical-gaps').textContent = analysisData.metrics?.critical_gaps || analysisData.critical_gaps || 0;
+        document.getElementById('processing-time').textContent = `${analysisData.processing_time}s`;
+
+        // Render charts
+        renderPillarChart();
+        renderComplianceChart();
+
+        // Render detailed sections
+        renderPillarDetails();
+        renderGapsTable();
+        renderRoadmap();
+        renderExecutiveSummary();
+    }
+
+    function renderPillarChart() {
+        const ctx = document.getElementById('pillar-chart').getContext('2d');
+        
+        const pillars = analysisData.pillars || [];
+        const labels = pillars.map(p => p.name.replace(' & ', ' &\n'));
+        const scores = pillars.map(p => p.score);
+        const colors = pillars.map(p => getRAGColor(p.status));
+
+        pillarChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Compliance Score (%)',
+                    data: scores,
+                    backgroundColor: colors,
+                    borderColor: colors.map(c => c.replace('0.7', '1')),
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(context) {
+                                const pillar = pillars[context.dataIndex];
+                                return pillar.finding || pillar.key_finding || '';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 0,
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function renderComplianceChart() {
+        const ctx = document.getElementById('compliance-chart').getContext('2d');
+        
+        const metrics = analysisData.metrics || {
+            compliant: 15,
+            partial: 6,
+            non_compliant: 4
+        };
+
+        complianceChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Compliant', 'Partial', 'Non-Compliant'],
+                datasets: [{
+                    data: [metrics.compliant, metrics.partial, metrics.non_compliant],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.8)',
+                        'rgba(255, 193, 7, 0.8)',
+                        'rgba(220, 53, 69, 0.8)'
+                    ],
+                    borderColor: [
+                        '#28a745',
+                        '#ffc107',
+                        '#dc3545'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    function renderPillarDetails() {
+        const container = document.getElementById('pillar-details');
+        const pillars = analysisData.pillars || [];
+
+        container.innerHTML = pillars.map((pillar, index) => `
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="pillar-card card status-${pillar.status.toLowerCase()}">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-2 text-center">
+                                    <div class="h3 mb-1 ${getRAGStatusClass(pillar.status)}">${formatPercentage(pillar.score)}</div>
+                                    <span class="badge ${getStatusBadgeClass(pillar.status)}">${pillar.status}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="fw-bold mb-1">${pillar.name}</h6>
+                                    <p class="text-muted mb-0">${pillar.finding || pillar.key_finding || 'Assessment completed'}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar" style="width: ${pillar.score}%; background-color: ${getRAGColor(pillar.status)}"></div>
+                                    </div>
+                                    <small class="text-muted">${pillar.gaps_count || 0} gap(s) identified</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderGapsTable() {
+        const tbody = document.getElementById('gaps-table');
+        const gaps = analysisData.gaps || [];
+        
+        tbody.innerHTML = gaps.map(gap => `
+            <tr class="gap-row ${gap.severity.toLowerCase()}" data-severity="${gap.severity}">
+                <td><strong>${gap.article || gap.requirement_id}</strong></td>
+                <td>${gap.description}</td>
+                <td><span class="badge ${getSeverityBadgeClass(gap.severity)}">${gap.severity}</span></td>
+                <td>${gap.timeline}</td>
+                <td>${gap.investment}</td>
+                <td>
+                    <button class="btn btn-outline-primary btn-sm" onclick="showGapDetails('${gap.gap_id || gap.article}')">
+                        <i class="fas fa-eye"></i> Details
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderRoadmap() {
+        const container = document.getElementById('roadmap-content');
+        const roadmap = analysisData.roadmap || [];
+
+        container.innerHTML = roadmap.map(phase => `
+            <div class="roadmap-phase phase-${phase.title.toLowerCase().includes('critical') ? 'critical' : 
+                                                 phase.title.toLowerCase().includes('high') ? 'high' : 'medium'}">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="fw-bold">${phase.phase}</h6>
+                    <span class="badge bg-info">${phase.investment}</span>
+                </div>
+                <h7 class="text-muted mb-2">${phase.title}</h7>
+                <ul class="mb-0">
+                    ${phase.items.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+            </div>
+        `).join('');
+    }
+
+    function renderExecutiveSummary() {
+        const container = document.getElementById('executive-summary');
+        container.innerHTML = analysisData.executive_summary || 
+            `This analysis reveals a ${analysisData.rag_status.toLowerCase()} compliance status with ${analysisData.overall_compliance.toFixed(1)}% overall compliance. 
+             Immediate attention is required for ${analysisData.metrics?.critical_gaps || 0} critical gaps to ensure regulatory readiness.`;
+    }
+
+    function filterGaps(severity) {
+        currentGapFilter = severity;
+        
+        // Update button states
+        document.querySelectorAll('.btn-group .btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Filter table rows
+        const rows = document.querySelectorAll('#gaps-table tr');
+        rows.forEach(row => {
+            const rowSeverity = row.dataset.severity;
+            if (severity === 'all' || rowSeverity === severity) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function showGapDetails(gapId) {
+        const gap = analysisData.gaps.find(g => g.gap_id === gapId || g.article === gapId);
+        if (!gap) return;
+
+        const modalBody = document.getElementById('gap-modal-body');
+        modalBody.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Gap Information</h6>
+                    <p><strong>Article:</strong> ${gap.article || gap.requirement_id}</p>
+                    <p><strong>Severity:</strong> <span class="badge ${getSeverityBadgeClass(gap.severity)}">${gap.severity}</span></p>
+                    <p><strong>Timeline:</strong> ${gap.timeline}</p>
+                    <p><strong>Investment:</strong> ${gap.investment}</p>
+                </div>
+                <div class="col-md-6">
+                    <h6>Impact & Recommendations</h6>
+                    <p><strong>Impact:</strong> ${gap.impact || 'Impact assessment pending'}</p>
+                    <p><strong>Recommendations:</strong> ${gap.recommendations || 'Detailed recommendations available in full report'}</p>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h6>Description</h6>
+                    <p>${gap.description}</p>
+                </div>
+            </div>
+        `;
+
+        const modal = new bootstrap.Modal(document.getElementById('gapModal'));
+        modal.show();
+    }
+
+    function exportReport() {
+        // In a real implementation, this would generate a PDF or Excel report
+        showAlert('Report export functionality coming soon!', 'info');
+    }
+
+    function getRAGColor(status) {
+        switch(status.toUpperCase()) {
+            case 'GREEN': return 'rgba(40, 167, 69, 0.7)';
+            case 'AMBER': return 'rgba(255, 193, 7, 0.7)';
+            case 'RED': return 'rgba(220, 53, 69, 0.7)';
+            default: return 'rgba(108, 117, 125, 0.7)';
+        }
+    }
+
+    function getStatusBadgeClass(status) {
+        switch(status.toUpperCase()) {
+            case 'GREEN': return 'bg-success';
+            case 'AMBER': return 'bg-warning text-dark';
+            case 'RED': return 'bg-danger';
+            default: return 'bg-secondary';
+        }
+    }
+</script>
+{% endblock %} 

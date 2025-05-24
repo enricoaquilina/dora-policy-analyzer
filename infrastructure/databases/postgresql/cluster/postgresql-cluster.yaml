@@ -1,0 +1,258 @@
+# PostgreSQL Cluster using CloudNativePG operator
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: dora-postgresql-cluster
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: database
+spec:
+  instances: 3
+  
+  # PostgreSQL configuration
+  postgresql:
+    parameters:
+      # Performance tuning
+      shared_preload_libraries: "pg_stat_statements,auto_explain"
+      max_connections: "200"
+      shared_buffers: "256MB"
+      effective_cache_size: "1GB"
+      work_mem: "16MB"
+      maintenance_work_mem: "128MB"
+      
+      # WAL configuration
+      wal_buffers: "16MB"
+      wal_level: "replica"
+      max_wal_size: "2GB"
+      min_wal_size: "1GB"
+      checkpoint_completion_target: "0.9"
+      
+      # Logging
+      log_statement: "all"
+      log_min_duration_statement: "1000"
+      log_lock_waits: "on"
+      log_temp_files: "0"
+      
+      # Security
+      ssl: "on"
+      ssl_ciphers: "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384"
+      ssl_prefer_server_ciphers: "on"
+      
+      # Compliance settings
+      log_connections: "on"
+      log_disconnections: "on"
+      log_hostname: "on"
+      log_line_prefix: "%t [%p]: [%l-1] user=%u,db=%d,app=%a,client=%h "
+      
+    pg_hba:
+      - "hostssl all all all scram-sha-256"
+      - "hostnossl all all all reject"
+  
+  # Primary database initialization
+  bootstrap:
+    initdb:
+      database: dora_compliance
+      owner: dora_app
+      secret:
+        name: dora-postgresql-app-user
+      encoding: UTF8
+      localeCType: C
+      localeCollate: C
+  
+  # Backup configuration
+  backup:
+    target: prefer-standby
+    retentionPolicy: "7d"
+    data:
+      encryption: AES256
+      compression: gzip
+    barmanObjectStore:
+      destinationPath: "s3://dora-backup-bucket/postgresql"
+      s3Credentials:
+        accessKeyId:
+          name: backup-credentials
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: backup-credentials
+          key: SECRET_ACCESS_KEY
+      wal:
+        retention: "7d"
+        compression: gzip
+        encryption: AES256
+      data:
+        retention: "30d"
+        jobs: 2
+  
+  # Resource allocation
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "1"
+    limits:
+      memory: "4Gi"
+      cpu: "2"
+  
+  # Storage configuration
+  storage:
+    size: 500Gi
+    storageClass: dora-fast-ssd
+  
+  # Monitoring configuration
+  monitoring:
+    enabled: true
+    podMonitorEnabled: true
+    podMonitorMetricsPort: 9187
+    disableDefaultQueries: false
+    customQueries:
+      - name: "dora_compliance_metrics"
+        help: "DORA compliance specific metrics"
+        values:
+          - "pg_database_size_bytes"
+          - "pg_stat_database_tup_returned"
+          - "pg_stat_database_tup_fetched"
+        query: |
+          SELECT
+            datname as database,
+            pg_database_size(datname) as size_bytes,
+            tup_returned,
+            tup_fetched
+          FROM pg_stat_database
+          WHERE datname NOT IN ('template0', 'template1', 'postgres')
+  
+  # Node placement
+  affinity:
+    topologyKey: kubernetes.io/hostname
+    tolerations:
+    - key: "data"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+  
+  nodeSelector:
+    role: data
+  
+  # Security context
+  postgresql:
+    securityContext:
+      runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
+      
+  # Certificates for SSL
+  certificates:
+    serverCertificate:
+      enabled: true
+      generateCA: true
+    serverAltDNSNames:
+      - "dora-postgresql-cluster-rw"
+      - "dora-postgresql-cluster-ro"
+      - "dora-postgresql-cluster-r"
+    clientCertificate:
+      enabled: true
+      generateCA: true
+
+---
+# Secret for application user
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dora-postgresql-app-user
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/part-of: dora-compliance
+type: kubernetes.io/basic-auth
+stringData:
+  username: dora_app
+  password: "dora-app-secure-password-change-me"
+
+---
+# Secret for backup credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: backup-credentials
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/part-of: dora-compliance
+type: Opaque
+stringData:
+  ACCESS_KEY_ID: "your-s3-access-key"
+  SECRET_ACCESS_KEY: "your-s3-secret-key"
+
+---
+# ScheduledBackup for regular backups
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: dora-postgresql-backup
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  backupOwnerReference: self
+  cluster:
+    name: dora-postgresql-cluster
+  
+---
+# Service for read-write access
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql-primary
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: primary
+spec:
+  type: ClusterIP
+  ports:
+  - name: postgres
+    port: 5432
+    targetPort: 5432
+  selector:
+    cnpg.io/cluster: dora-postgresql-cluster
+    role: primary
+
+---
+# Service for read-only access
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql-readonly
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: readonly
+spec:
+  type: ClusterIP
+  ports:
+  - name: postgres
+    port: 5432
+    targetPort: 5432
+  selector:
+    cnpg.io/cluster: dora-postgresql-cluster
+    role: replica
+
+---
+# PodDisruptionBudget for high availability
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dora-postgresql-pdb
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      cnpg.io/cluster: dora-postgresql-cluster 

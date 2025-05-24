@@ -1,0 +1,436 @@
+# Monitoring and Observability Configuration for DORA Compliance Platform
+
+# General Configuration
+monitoring:
+  # Metrics configuration
+  metrics:
+    prometheus:
+      host: "localhost"
+      port: 9090
+      scrape_interval: "15s"
+      retention: "30d"
+      gateway_url: "localhost:9091"  # Pushgateway
+    
+    custom_metrics:
+      enabled: true
+      namespace: "dora_compliance"
+      default_labels:
+        environment: "production"
+        service: "agent-orchestration"
+        version: "1.0.0"
+    
+    collection_interval: 30  # seconds
+    buffer_size: 10000
+    
+  # Distributed Tracing
+  tracing:
+    enabled: true
+    
+    jaeger:
+      host: "localhost"
+      port: 14268
+      agent_port: 6831
+      sampler_type: "probabilistic"
+      sampler_param: 0.1  # 10% sampling
+    
+    opentelemetry:
+      enabled: true
+      endpoint: "http://otel-collector:4317"
+      insecure: true
+      headers:
+        authorization: "Bearer your-token"
+    
+    span_processor:
+      batch_size: 512
+      batch_timeout: "1s"
+      max_queue_size: 2048
+  
+  # Log Aggregation
+  logging:
+    elasticsearch:
+      hosts: ["localhost:9200"]
+      username: "elastic"
+      password_env: "ELASTICSEARCH_PASSWORD"
+      index_pattern: "dora-logs-{date}"
+      retention_days: 90
+      shards: 1
+      replicas: 1
+    
+    structured_logging:
+      enabled: true
+      format: "json"
+      level: "info"
+      fields:
+        - timestamp
+        - level
+        - service
+        - component
+        - trace_id
+        - span_id
+        - user_id
+        - session_id
+        - message
+    
+    buffer:
+      size: 10000
+      flush_interval: 5  # seconds
+      batch_size: 100
+  
+  # Alerting System
+  alerting:
+    enabled: true
+    webhook_timeout: "30s"
+    retry_attempts: 3
+    retry_delay: "1m"
+    alert_grouping: true
+    grouping_window: "10m"
+    
+    # Notification Channels
+    channels:
+      email:
+        enabled: true
+        smtp_host: "smtp.company.com"
+        smtp_port: 587
+        use_tls: true
+        username: "alerts@company.com"
+        password_env: "SMTP_PASSWORD"
+        from_address: "DORA Alerts <alerts@company.com>"
+        recipients:
+          - "ops@company.com"
+          - "dev@company.com"
+        templates:
+          alert: "templates/alert_email.html"
+          resolution: "templates/resolution_email.html"
+      
+      slack:
+        enabled: true
+        webhook_url_env: "SLACK_WEBHOOK_URL"
+        default_channel: "#ops-alerts"
+        username: "DORA Monitoring"
+        icon_emoji: ":warning:"
+        mention_users:
+          - "@ops-team"
+          - "@platform-team"
+        channels_mapping:
+          critical: "#critical-alerts"
+          warning: "#ops-alerts"
+          info: "#general"
+      
+      pagerduty:
+        enabled: false
+        integration_key_env: "PAGERDUTY_INTEGRATION_KEY"
+        severity_mapping:
+          critical: "critical"
+          warning: "warning"
+          info: "info"
+      
+      webhook:
+        enabled: true
+        url: "https://hooks.company.com/monitoring"
+        headers:
+          Authorization: "Bearer webhook-token"
+          Content-Type: "application/json"
+        timeout: "10s"
+    
+    # Default Alert Rules
+    default_rules:
+      system_health:
+        - name: "High CPU Usage"
+          metric: "system_cpu_usage_percent"
+          threshold: 85.0
+          comparison: ">"
+          duration: "5m"
+          severity: "warning"
+          channels: ["email", "slack"]
+          labels:
+            category: "system"
+            priority: "medium"
+          annotations:
+            summary: "High CPU usage detected"
+            description: "CPU usage is above 85% for more than 5 minutes"
+        
+        - name: "Critical Memory Usage"
+          metric: "system_memory_usage_percent"
+          threshold: 90.0
+          comparison: ">"
+          duration: "3m"
+          severity: "critical"
+          channels: ["pagerduty", "slack"]
+          labels:
+            category: "system"
+            priority: "high"
+          annotations:
+            summary: "Critical memory usage"
+            description: "Memory usage is above 90%"
+      
+      application_health:
+        - name: "High Workflow Error Rate"
+          metric: "workflow_error_rate"
+          threshold: 0.05  # 5%
+          comparison: ">"
+          duration: "10m"
+          severity: "critical"
+          channels: ["pagerduty", "slack"]
+          labels:
+            category: "application"
+            priority: "high"
+        
+        - name: "Agent Task Backlog"
+          metric: "agent_task_queue_size"
+          threshold: 1000
+          comparison: ">"
+          duration: "15m"
+          severity: "warning"
+          channels: ["email", "slack"]
+      
+      dora_metrics:
+        - name: "Low Deployment Frequency"
+          metric: "dora_deployment_frequency"
+          threshold: 1.0
+          comparison: "<"
+          duration: "1h"
+          severity: "warning"
+          channels: ["email"]
+          labels:
+            category: "dora"
+            priority: "medium"
+        
+        - name: "High Change Failure Rate"
+          metric: "dora_change_failure_rate"
+          threshold: 0.15  # 15%
+          comparison: ">"
+          duration: "30m"
+          severity: "critical"
+          channels: ["pagerduty", "slack"]
+  
+  # Anomaly Detection
+  anomaly_detection:
+    enabled: true
+    models:
+      isolation_forest:
+        contamination: 0.1
+        random_state: 42
+        n_estimators: 100
+      
+    training:
+      min_data_points: 100
+      retrain_interval: "24h"
+      historical_window: "7d"
+    
+    detection:
+      confidence_threshold: 0.8
+      check_interval: "2m"
+      alert_on_anomaly: true
+  
+  # Performance Monitoring
+  performance:
+    enabled: true
+    collection_interval: "1m"
+    retention_points: 1000
+    
+    thresholds:
+      response_time: 5.0  # seconds
+      cpu_usage: 80.0     # percentage
+      memory_usage: 85.0  # percentage
+      disk_usage: 90.0    # percentage
+    
+    bottleneck_detection:
+      enabled: true
+      analysis_interval: "5m"
+      severity_levels:
+        high: 90.0
+        medium: 80.0
+        low: 70.0
+  
+  # Audit Logging
+  audit:
+    enabled: true
+    buffer_size: 50000
+    flush_interval: "10s"
+    batch_size: 100
+    
+    events:
+      data_access: true
+      security: true
+      compliance: true
+      configuration_changes: true
+      user_actions: true
+    
+    retention:
+      days: 2555  # 7 years for compliance
+      archive_after: 365  # 1 year
+    
+    sensitive_fields:
+      - password
+      - token
+      - api_key
+      - secret
+  
+  # Dashboard Configuration
+  dashboards:
+    enabled: true
+    
+    grafana:
+      host: "localhost"
+      port: 3000
+      api_key_env: "GRAFANA_API_KEY"
+      default_folder: "DORA Compliance"
+      datasource: "prometheus"
+    
+    auto_provisioning:
+      enabled: true
+      dashboard_paths:
+        - "dashboards/executive.json"
+        - "dashboards/operational.json"
+        - "dashboards/agent-specific.json"
+        - "dashboards/dora-metrics.json"
+    
+    default_dashboards:
+      executive:
+        title: "DORA Compliance Executive View"
+        refresh_interval: "5m"
+        panels:
+          - deployment_frequency
+          - lead_time_for_changes
+          - change_failure_rate
+          - time_to_restore_service
+      
+      operational:
+        title: "System Operations"
+        refresh_interval: "30s"
+        panels:
+          - system_health
+          - active_workflows
+          - error_rates
+          - response_times
+      
+      security:
+        title: "Security Monitoring"
+        refresh_interval: "1m"
+        panels:
+          - authentication_attempts
+          - security_incidents
+          - compliance_violations
+          - audit_events
+
+# Environment-specific configurations
+environments:
+  development:
+    monitoring:
+      metrics:
+        collection_interval: 10
+        prometheus:
+          retention: "7d"
+      logging:
+        level: "debug"
+        elasticsearch:
+          hosts: ["localhost:9200"]
+          retention_days: 7
+      alerting:
+        enabled: false
+      anomaly_detection:
+        enabled: false
+  
+  staging:
+    monitoring:
+      metrics:
+        collection_interval: 20
+      logging:
+        elasticsearch:
+          retention_days: 30
+      alerting:
+        channels:
+          slack:
+            default_channel: "#staging-alerts"
+  
+  production:
+    monitoring:
+      metrics:
+        collection_interval: 30
+        prometheus:
+          retention: "90d"
+      logging:
+        elasticsearch:
+          retention_days: 90
+          replicas: 2
+      alerting:
+        enabled: true
+        channels:
+          pagerduty:
+            enabled: true
+      audit:
+        retention:
+          days: 2555
+          archive_after: 365
+
+# Feature flags
+features:
+  advanced_anomaly_detection: true
+  custom_dashboards: true
+  real_time_alerting: true
+  compliance_reporting: true
+  performance_profiling: true
+  distributed_tracing: true
+  log_analysis: true
+
+# Integration settings
+integrations:
+  kubernetes:
+    enabled: true
+    namespace: "dora-agents"
+    service_monitor: true
+    pod_monitoring: true
+  
+  prometheus:
+    scrape_configs:
+      - job_name: "dora-agents"
+        static_configs:
+          - targets: ["localhost:8000"]
+  
+  jaeger:
+    strategy: "all_services"
+    max_traces_per_second: 1000
+  
+  elasticsearch:
+    index_templates:
+      logs:
+        pattern: "dora-logs-*"
+        settings:
+          number_of_shards: 1
+          number_of_replicas: 1
+      audit:
+        pattern: "audit-logs-*"
+        settings:
+          number_of_shards: 2
+          number_of_replicas: 2
+
+# Security settings
+security:
+  encryption:
+    enabled: true
+    algorithm: "AES-256-GCM"
+  
+  authentication:
+    enabled: true
+    token_expiry: 3600
+  
+  tls:
+    enabled: true
+    cert_path: "/etc/ssl/certs/monitoring.crt"
+    key_path: "/etc/ssl/private/monitoring.key"
+  
+  api_keys:
+    rotation_interval: "90d"
+    min_length: 32
+
+# Resource limits
+resources:
+  memory_limit: "2Gi"
+  cpu_limit: "1000m"
+  disk_limit: "10Gi"
+  
+  buffer_limits:
+    metrics: 100000
+    logs: 50000
+    traces: 10000
+    audit: 100000 

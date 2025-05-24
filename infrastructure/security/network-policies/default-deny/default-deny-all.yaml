@@ -1,0 +1,412 @@
+# Default Deny All Network Policies for Zero-Trust Security
+# These policies block all traffic by default and must be applied first
+
+---
+# Default deny all ingress traffic in dora-system namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-ingress
+  namespace: dora-system
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+
+---
+# Default deny all egress traffic in dora-system namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-egress
+  namespace: dora-system
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+
+---
+# Default deny all ingress traffic in dora-agents namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-ingress
+  namespace: dora-agents
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+
+---
+# Default deny all egress traffic in dora-agents namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-egress
+  namespace: dora-agents
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+
+---
+# Default deny all ingress traffic in dora-data namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-ingress
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+
+---
+# Default deny all egress traffic in dora-data namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-egress
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+
+---
+# Default deny all ingress traffic in dora-monitoring namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-ingress
+  namespace: dora-monitoring
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+
+---
+# Default deny all egress traffic in dora-monitoring namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-egress
+  namespace: dora-monitoring
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+
+---
+# Default deny all ingress traffic in dora-security namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-ingress
+  namespace: dora-security
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+
+---
+# Default deny all egress traffic in dora-security namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-egress
+  namespace: dora-security
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+
+---
+# Allow DNS resolution for all namespaces (required for basic operation)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-access
+  namespace: dora-system
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: allow-essential
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+
+---
+# Allow DNS resolution for dora-agents namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-access
+  namespace: dora-agents
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: allow-essential
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+
+---
+# Allow DNS resolution for dora-data namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-access
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: allow-essential
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+
+---
+# Allow DNS resolution for dora-monitoring namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-access
+  namespace: dora-monitoring
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: allow-essential
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+
+---
+# Allow DNS resolution for dora-security namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-access
+  namespace: dora-security
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: allow-essential
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+
+---
+# Allow access to Kubernetes API server from all namespaces (required for service mesh, operators, etc.)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-kubernetes-api
+  namespace: dora-system
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: allow-essential
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 6443
+
+---
+# Allow access to Kubernetes API server from dora-agents
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-kubernetes-api
+  namespace: dora-agents
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: allow-essential
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 6443
+
+---
+# Allow access to Kubernetes API server from dora-data
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-kubernetes-api
+  namespace: dora-data
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: allow-essential
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 6443
+
+---
+# Allow access to Kubernetes API server from dora-monitoring
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-kubernetes-api
+  namespace: dora-monitoring
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: allow-essential
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 6443
+
+---
+# Allow access to Kubernetes API server from dora-security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-kubernetes-api
+  namespace: dora-security
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: security
+    policy-type: allow-essential
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 6443 

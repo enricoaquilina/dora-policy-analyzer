@@ -1,0 +1,432 @@
+# HashiCorp Vault Cluster for DORA Compliance System
+apiVersion: vault.banzaicloud.com/v1alpha1
+kind: Vault
+metadata:
+  name: dora-vault-cluster
+  namespace: dora-security
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/part-of: dora-compliance
+    app.kubernetes.io/component: secrets-management
+spec:
+  size: 3
+  image: hashicorp/vault:1.15.4
+  
+  # Auto-unsealing configuration using AWS KMS
+  config:
+    storage:
+      raft:
+        path: "/vault/data"
+        node_id: "HOSTNAME"
+        retry_join:
+          - leader_api_addr: "https://dora-vault-cluster-0.dora-vault-cluster:8200"
+          - leader_api_addr: "https://dora-vault-cluster-1.dora-vault-cluster:8200"
+          - leader_api_addr: "https://dora-vault-cluster-2.dora-vault-cluster:8200"
+    
+    listener:
+      tcp:
+        address: "0.0.0.0:8200"
+        tls_cert_file: "/vault/tls/tls.crt"
+        tls_key_file: "/vault/tls/tls.key"
+        tls_client_ca_file: "/vault/tls/ca.crt"
+        tls_require_and_verify_client_cert: true
+        tls_min_version: "tls13"
+        telemetry:
+          unauthenticated_metrics_access: false
+    
+    api_addr: "https://HOSTNAME:8200"
+    cluster_addr: "https://HOSTNAME:8201"
+    
+    # Auto-unsealing with AWS KMS
+    seal:
+      awskms:
+        region: "us-west-2"
+        kms_key_id: "alias/dora-vault-seal-key"
+        endpoint: ""
+    
+    # Performance and security settings
+    max_lease_ttl: "87600h"    # 10 years
+    default_lease_ttl: "8760h"  # 1 year
+    cluster_name: "dora-vault-cluster"
+    cache_size: "131072"
+    disable_mlock: false
+    disable_cache: false
+    disable_indexing: false
+    disable_performance_standby: false
+    
+    # Audit logging
+    audit:
+      file:
+        path: "/vault/audit/audit.log"
+        format: "json"
+        log_raw: false
+        hmac_accessor: true
+        mode: "0600"
+        prefix: "vault_audit_"
+    
+    # UI configuration
+    ui: true
+    
+    # Telemetry
+    telemetry:
+      prometheus_retention_time: "30s"
+      disable_hostname: false
+      
+    # Plugin directory
+    plugin_directory: "/vault/plugins"
+    
+    # Log level
+    log_level: "INFO"
+    log_format: "json"
+
+  # Persistent storage
+  volumeClaimTemplates:
+    - metadata:
+        name: vault-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: dora-fast-ssd
+        resources:
+          requests:
+            storage: 100Gi
+    - metadata:
+        name: vault-audit
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: dora-fast-ssd
+        resources:
+          requests:
+            storage: 50Gi
+
+  # Resource requirements
+  resources:
+    vault:
+      requests:
+        memory: "2Gi"
+        cpu: "1000m"
+      limits:
+        memory: "4Gi"
+        cpu: "2000m"
+
+  # Security context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 100
+    runAsGroup: 1000
+    fsGroup: 1000
+    capabilities:
+      add:
+        - IPC_LOCK
+
+  # Node placement
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: vault
+          topologyKey: kubernetes.io/hostname
+
+  nodeSelector:
+    role: data
+
+  tolerations:
+    - key: "data"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+
+  # Service account
+  serviceAccount: vault-service-account
+
+  # TLS configuration
+  existingTlsSecretName: vault-tls-secret
+
+  # Additional volumes
+  volumes:
+    - name: vault-plugins
+      emptyDir: {}
+    
+  volumeMounts:
+    - name: vault-plugins
+      mountPath: /vault/plugins
+
+  # Environment variables
+  env:
+    - name: VAULT_ADDR
+      value: "https://127.0.0.1:8200"
+    - name: VAULT_CLUSTER_ADDR
+      value: "https://127.0.0.1:8201"
+    - name: VAULT_LOG_LEVEL
+      value: "INFO"
+    - name: VAULT_LOG_FORMAT
+      value: "json"
+    - name: SKIP_CHOWN
+      value: "true"
+
+  # Readiness and liveness probes
+  vaultReadinessProbe:
+    httpGet:
+      path: /v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204
+      port: 8200
+      scheme: HTTPS
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+  vaultLivenessProbe:
+    httpGet:
+      path: /v1/sys/health?standbyok=true
+      port: 8200
+      scheme: HTTPS
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 5
+
+  # Pod disruption budget
+  podDisruptionBudget:
+    minAvailable: 2
+
+---
+# Service Account for Vault
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-service-account
+  namespace: dora-security
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/part-of: dora-compliance
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::ACCOUNT_ID:role/VaultKMSRole"
+
+---
+# ClusterRole for Vault
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vault-cluster-role
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/part-of: dora-compliance
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["serviceaccounts"]
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["authentication.k8s.io"]
+  resources: ["tokenreviews"]
+  verbs: ["create"]
+- apiGroups: ["authorization.k8s.io"]
+  resources: ["subjectaccessreviews"]
+  verbs: ["create"]
+
+---
+# ClusterRoleBinding for Vault
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vault-cluster-role-binding
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/part-of: dora-compliance
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vault-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: vault-service-account
+  namespace: dora-security
+
+---
+# TLS Secret for Vault (placeholder - certificates should be generated)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vault-tls-secret
+  namespace: dora-security
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/part-of: dora-compliance
+type: kubernetes.io/tls
+data:
+  tls.crt: # Base64 encoded certificate
+  tls.key: # Base64 encoded private key
+  ca.crt:  # Base64 encoded CA certificate
+
+---
+# Service for Vault cluster
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault-service
+  namespace: dora-security
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/part-of: dora-compliance
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  ports:
+  - name: vault-port
+    port: 8200
+    targetPort: 8200
+    protocol: TCP
+  - name: vault-cluster-port
+    port: 8201
+    targetPort: 8201
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: vault
+
+---
+# Headless service for StatefulSet
+apiVersion: v1
+kind: Service
+metadata:
+  name: dora-vault-cluster
+  namespace: dora-security
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  clusterIP: None
+  ports:
+  - name: vault-port
+    port: 8200
+    targetPort: 8200
+  - name: vault-cluster-port
+    port: 8201
+    targetPort: 8201
+  selector:
+    app.kubernetes.io/name: vault
+
+---
+# ConfigMap for Vault initialization
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-init-config
+  namespace: dora-security
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/part-of: dora-compliance
+data:
+  init.json: |
+    {
+      "secret_shares": 5,
+      "secret_threshold": 3,
+      "stored_shares": 1,
+      "recovery_shares": 5,
+      "recovery_threshold": 3,
+      "recovery_pgp_keys": [],
+      "root_token_pgp_key": ""
+    }
+
+---
+# ServiceMonitor for Prometheus monitoring
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: vault-metrics
+  namespace: dora-security
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vault
+  endpoints:
+  - port: vault-port
+    interval: 30s
+    path: /v1/sys/metrics
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
+    params:
+      format: ['prometheus']
+
+---
+# NetworkPolicy for Vault
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: vault-network-policy
+  namespace: dora-security
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/part-of: dora-compliance
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: vault
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow access from all namespaces (applications need to access Vault)
+  - from:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 8200
+  # Allow cluster communication between Vault instances
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: vault
+    ports:
+    - protocol: TCP
+      port: 8201
+  # Allow monitoring access
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: dora-monitoring
+    ports:
+    - protocol: TCP
+      port: 8200
+  egress:
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+  # Allow AWS KMS access for auto-unsealing
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+  # Allow internal cluster communication
+  - to:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: vault
+    ports:
+    - protocol: TCP
+      port: 8200
+    - protocol: TCP
+      port: 8201 

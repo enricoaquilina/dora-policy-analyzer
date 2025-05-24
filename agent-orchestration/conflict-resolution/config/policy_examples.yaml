@@ -1,0 +1,418 @@
+# DORA Compliance Conflict Resolution Policy Examples
+
+# =============================================================================
+# Development Environment Policy
+# =============================================================================
+development:
+  # Global settings - more relaxed for development
+  detection_interval: 10  # seconds
+  resolution_timeout: 60  # seconds
+  max_retries: 5
+  
+  # Resource conflict policies - development has limited resources
+  resource_conflicts:
+    cpu:
+      strategy: fair_share
+      preemption_threshold: 0.9  # Allow higher utilization
+      grace_period: 30  # Longer grace period for debugging
+      min_allocation: 1
+      max_allocation: 8
+    
+    memory:
+      strategy: fair_share
+      min_allocation: "512MB"
+      max_allocation: "8GB"
+      preemption_threshold: 0.85
+    
+    storage:
+      strategy: quota_enforcement
+      default_quota: "50GB"
+      burst_allowance: 1.5  # 50% burst
+      cleanup_threshold: 0.8
+    
+    database_connections:
+      strategy: fair_share
+      max_connections: 20
+      connection_timeout: 30
+      idle_timeout: 300
+  
+  # Data access conflict policies - more permissive for testing
+  data_conflicts:
+    strategy: lock_escalation
+    lock_timeout: 60  # Longer timeout for debugging
+    retry_interval: 2
+    max_wait_time: 600  # 10 minutes
+    deadlock_detection_interval: 30
+    enable_lock_monitoring: true
+  
+  # Workflow dependency policies - simpler dependency chains
+  workflow_conflicts:
+    strategy: dependency_ordering
+    deadlock_timeout: 120  # 2 minutes
+    max_dependency_depth: 5  # Shallower for dev
+    circular_dependency_action: abort_lowest_priority
+    enable_dependency_visualization: true
+    timeout_escalation_factor: 1.5
+  
+  # Agent competition policies - development has fewer agents
+  agent_conflicts:
+    strategy: round_robin  # Simple round-robin for dev
+    load_balance_factor: 0.2
+    capability_weight: 0.8
+    prefer_local_agents: true
+    agent_health_check_interval: 30
+    max_concurrent_assignments: 3
+
+  # Priority calculation - flatter hierarchy for dev
+  priority_settings:
+    base_priorities:
+      critical: 5
+      high: 4
+      medium: 3
+      low: 2
+      background: 1
+    
+    aging_factor: 0.05  # Slower aging
+    max_age_boost: 1.0  # Lower maximum boost
+    sla_multipliers:
+      dev: 1.0
+      test: 1.1
+
+# =============================================================================
+# Production Environment Policy
+# =============================================================================
+production:
+  # Global settings - optimized for production performance
+  detection_interval: 3  # seconds - faster detection
+  resolution_timeout: 20  # seconds - faster resolution
+  max_retries: 3
+  enable_predictive_analysis: true
+  conflict_history_retention: 30  # days
+  
+  # Resource conflict policies - production has more resources but stricter control
+  resource_conflicts:
+    cpu:
+      strategy: priority_preemption
+      preemption_threshold: 0.75  # More aggressive preemption
+      grace_period: 5  # Shorter grace period
+      min_allocation: 2
+      max_allocation: 64
+      emergency_reserve: 10  # Reserve cores for critical workloads
+      preemption_cost_threshold: 0.3
+    
+    memory:
+      strategy: priority_preemption
+      min_allocation: "2GB"
+      max_allocation: "128GB"
+      preemption_threshold: 0.8
+      memory_pressure_threshold: 0.9
+      enable_memory_compression: true
+    
+    storage:
+      strategy: quota_enforcement
+      default_quota: "500GB"
+      burst_allowance: 1.2  # 20% burst
+      cleanup_threshold: 0.75
+      hot_storage_limit: "100GB"
+      cold_storage_migration_threshold: 0.8
+    
+    network:
+      strategy: bandwidth_allocation
+      default_bandwidth: "1Gbps"
+      max_bandwidth: "10Gbps"
+      qos_classes:
+        critical: 0.4
+        high: 0.3
+        medium: 0.2
+        low: 0.1
+    
+    database_connections:
+      strategy: priority_preemption
+      max_connections: 200
+      connection_timeout: 10
+      idle_timeout: 120
+      connection_pool_size: 50
+    
+    external_api_quota:
+      strategy: rate_limiting
+      default_rate_limit: 1000  # requests per minute
+      burst_capacity: 200
+      backoff_strategy: exponential
+      quota_refresh_interval: 60
+    
+    license:
+      strategy: priority_allocation
+      license_pool_monitoring: true
+      license_usage_prediction: true
+      renewal_threshold: 0.9
+  
+  # Data access conflict policies - stricter for production
+  data_conflicts:
+    strategy: lock_escalation
+    lock_timeout: 15  # Shorter timeout
+    retry_interval: 0.5
+    max_wait_time: 180  # 3 minutes
+    deadlock_detection_interval: 10
+    enable_lock_monitoring: true
+    lock_contention_threshold: 0.7
+    auto_escalation_enabled: true
+  
+  # Workflow dependency policies - complex workflows in production
+  workflow_conflicts:
+    strategy: dependency_ordering
+    deadlock_timeout: 45  # seconds
+    max_dependency_depth: 15
+    circular_dependency_action: abort_lowest_priority
+    enable_dependency_visualization: false  # Disable for performance
+    timeout_escalation_factor: 2.0
+    parallel_resolution_enabled: true
+    dependency_cache_enabled: true
+  
+  # Agent competition policies - production has many agents
+  agent_conflicts:
+    strategy: capability_matching
+    load_balance_factor: 0.3
+    capability_weight: 0.7
+    prefer_local_agents: true
+    agent_health_check_interval: 10
+    max_concurrent_assignments: 10
+    failover_enabled: true
+    agent_performance_tracking: true
+
+  # Priority calculation - steep hierarchy for production
+  priority_settings:
+    base_priorities:
+      critical: 15
+      high: 10
+      medium: 5
+      low: 2
+      background: 1
+    
+    aging_factor: 0.2  # Faster aging to prevent starvation
+    max_age_boost: 3.0  # Higher maximum boost
+    sla_multipliers:
+      platinum: 2.0
+      gold: 1.5
+      silver: 1.0
+      bronze: 0.7
+      basic: 0.5
+    
+    business_criticality_multipliers:
+      regulatory_compliance: 3.0
+      customer_facing: 2.0
+      internal_operations: 1.0
+      development: 0.5
+
+  # Advanced production features
+  advanced_features:
+    predictive_conflict_detection:
+      enabled: true
+      ml_model: "conflict_predictor_v2"
+      prediction_horizon: 300  # seconds
+      confidence_threshold: 0.75
+    
+    adaptive_policies:
+      enabled: true
+      learning_rate: 0.01
+      adaptation_interval: 3600  # 1 hour
+      policy_drift_threshold: 0.1
+    
+    multi_datacenter:
+      enabled: true
+      primary_datacenter: "us-east-1"
+      failover_datacenters: ["us-west-2", "eu-west-1"]
+      cross_datacenter_latency_threshold: 100  # ms
+    
+    compliance_monitoring:
+      enabled: true
+      audit_all_resolutions: true
+      compliance_frameworks: ["DORA", "SOX", "GDPR"]
+      retention_period: 2555  # 7 years in days
+
+# =============================================================================
+# High-Availability Environment Policy
+# =============================================================================
+high_availability:
+  # Global settings - optimized for HA
+  detection_interval: 1  # seconds - very fast detection
+  resolution_timeout: 10  # seconds - very fast resolution
+  max_retries: 5
+  enable_predictive_analysis: true
+  enable_proactive_resolution: true
+  
+  # Resource conflict policies - HA requires resource redundancy
+  resource_conflicts:
+    cpu:
+      strategy: priority_preemption
+      preemption_threshold: 0.6  # Very aggressive
+      grace_period: 2  # Very short grace period
+      emergency_reserve: 20  # Large reserve
+      multi_zone_allocation: true
+      auto_scaling_enabled: true
+      scaling_threshold: 0.7
+    
+    memory:
+      strategy: priority_preemption
+      preemption_threshold: 0.7
+      emergency_reserve: "32GB"
+      memory_balancing_enabled: true
+      numa_awareness: true
+    
+    storage:
+      strategy: tiered_allocation
+      hot_tier_quota: "1TB"
+      warm_tier_quota: "5TB"
+      cold_tier_quota: "50TB"
+      auto_tiering_enabled: true
+      replication_factor: 3
+    
+    network:
+      strategy: multi_path_allocation
+      primary_bandwidth: "25Gbps"
+      backup_bandwidth: "10Gbps"
+      latency_threshold: 10  # ms
+      jitter_threshold: 5  # ms
+      packet_loss_threshold: 0.001
+  
+  # Data access conflict policies - HA requires distributed coordination
+  data_conflicts:
+    strategy: distributed_locking
+    consensus_algorithm: "raft"
+    quorum_size: 3
+    lock_timeout: 5
+    distributed_deadlock_detection: true
+    cross_datacenter_consistency: "eventual"
+  
+  # Workflow dependency policies - HA workflows are complex
+  workflow_conflicts:
+    strategy: distributed_dependency_ordering
+    deadlock_timeout: 20
+    max_dependency_depth: 20
+    cross_datacenter_dependencies: true
+    dependency_replication_factor: 3
+    byzantine_fault_tolerance: true
+  
+  # Agent competition policies - HA has agent redundancy
+  agent_conflicts:
+    strategy: multi_criteria_optimization
+    criteria:
+      capability_match: 0.4
+      load_balance: 0.2
+      availability: 0.2
+      locality: 0.1
+      reliability: 0.1
+    agent_redundancy_factor: 2
+    health_check_interval: 5
+    failover_time_threshold: 3  # seconds
+
+  # Priority calculation - complex priority system for HA
+  priority_settings:
+    base_priorities:
+      emergency: 20
+      critical: 15
+      high: 10
+      medium: 5
+      low: 2
+      background: 1
+    
+    aging_factor: 0.3
+    max_age_boost: 5.0
+    availability_zone_multipliers:
+      primary: 1.0
+      secondary: 0.9
+      tertiary: 0.8
+    
+    service_tier_multipliers:
+      tier_1: 3.0  # Mission critical
+      tier_2: 2.0  # Business critical
+      tier_3: 1.0  # Standard
+      tier_4: 0.5  # Non-critical
+
+  # HA-specific features
+  high_availability_features:
+    active_active_deployment: true
+    cross_region_replication: true
+    automatic_failover: true
+    split_brain_detection: true
+    chaos_engineering: true
+    disaster_recovery:
+      rto: 60  # seconds
+      rpo: 30  # seconds
+      backup_frequency: 300  # 5 minutes
+      cross_region_backup: true
+
+# =============================================================================
+# Testing Environment Policy
+# =============================================================================
+testing:
+  # Global settings - focused on observability and debugging
+  detection_interval: 5
+  resolution_timeout: 30
+  max_retries: 1  # Fail fast for testing
+  enable_detailed_logging: true
+  enable_conflict_simulation: true
+  
+  # Resource conflict policies - limited resources for testing
+  resource_conflicts:
+    cpu:
+      strategy: fair_share
+      preemption_threshold: 0.95
+      grace_period: 60  # Long grace for analysis
+      resource_allocation_tracing: true
+    
+    memory:
+      strategy: fair_share
+      enable_memory_pressure_simulation: true
+      memory_leak_detection: true
+  
+  # Data access conflict policies - designed for testing scenarios
+  data_conflicts:
+    strategy: lock_escalation
+    lock_timeout: 120  # Long timeout for debugging
+    enable_lock_tracing: true
+    deadlock_injection_enabled: true  # For testing
+  
+  # Workflow dependency policies - support complex test scenarios
+  workflow_conflicts:
+    strategy: dependency_ordering
+    enable_dependency_injection: true
+    circular_dependency_simulation: true
+    dependency_graph_export: true
+  
+  # Agent competition policies - controllable for testing
+  agent_conflicts:
+    strategy: manual_assignment  # Manual control for tests
+    enable_agent_simulation: true
+    agent_failure_injection: true
+
+  # Priority calculation - simple for predictable testing
+  priority_settings:
+    base_priorities:
+      test_critical: 10
+      test_high: 5
+      test_medium: 3
+      test_low: 1
+    
+    aging_factor: 0.0  # No aging for predictable tests
+    deterministic_resolution: true  # Predictable outcomes
+
+  # Testing-specific features
+  testing_features:
+    conflict_injection:
+      enabled: true
+      injection_rate: 0.1  # 10% of operations
+      conflict_types: ["resource", "deadlock", "agent_competition"]
+    
+    performance_profiling:
+      enabled: true
+      profile_resolution_paths: true
+      memory_profiling: true
+      cpu_profiling: true
+    
+    regression_testing:
+      enabled: true
+      baseline_scenarios: "test_scenarios.yaml"
+      performance_thresholds:
+        max_resolution_time: 5.0  # seconds
+        max_memory_usage: "1GB"
+        max_cpu_usage: 0.5  # 50% 

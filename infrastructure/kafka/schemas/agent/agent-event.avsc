@@ -1,0 +1,204 @@
+{
+  "type": "record",
+  "name": "AgentEvent",
+  "namespace": "com.dora.compliance.agent",
+  "doc": "Schema for agent lifecycle and status events",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string",
+      "doc": "Unique identifier for this event"
+    },
+    {
+      "name": "agentId",
+      "type": "string",
+      "doc": "Unique identifier for the agent"
+    },
+    {
+      "name": "timestamp",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Event timestamp in milliseconds since epoch"
+    },
+    {
+      "name": "eventType",
+      "type": {
+        "type": "enum",
+        "name": "AgentEventType",
+        "symbols": [
+          "STARTED",
+          "STOPPED",
+          "HEARTBEAT",
+          "ERROR",
+          "TASK_ASSIGNED",
+          "TASK_COMPLETED",
+          "TASK_FAILED",
+          "CONFIG_UPDATED",
+          "HEALTH_CHECK",
+          "RESOURCE_ALERT"
+        ]
+      },
+      "doc": "Type of agent event"
+    },
+    {
+      "name": "agentType",
+      "type": {
+        "type": "enum",
+        "name": "AgentType",
+        "symbols": [
+          "POLICY_ANALYSIS_AGENT",
+          "RISK_ASSESSMENT_AGENT",
+          "INCIDENT_MANAGEMENT_AGENT",
+          "THIRD_PARTY_RISK_AGENT",
+          "THREAT_INTELLIGENCE_AGENT",
+          "RESILIENCE_TESTING_AGENT",
+          "IMPLEMENTATION_PLANNING_AGENT",
+          "ORCHESTRATOR_AGENT"
+        ]
+      },
+      "doc": "Type of agent generating the event"
+    },
+    {
+      "name": "status",
+      "type": {
+        "type": "enum",
+        "name": "AgentStatus",
+        "symbols": [
+          "HEALTHY",
+          "DEGRADED",
+          "UNHEALTHY",
+          "UNKNOWN"
+        ]
+      },
+      "doc": "Current health status of the agent"
+    },
+    {
+      "name": "version",
+      "type": "string",
+      "doc": "Version of the agent software"
+    },
+    {
+      "name": "nodeId",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Kubernetes node where agent is running"
+    },
+    {
+      "name": "podId",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Kubernetes pod identifier"
+    },
+    {
+      "name": "message",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Human-readable event message"
+    },
+    {
+      "name": "metadata",
+      "type": {
+        "type": "map",
+        "values": "string"
+      },
+      "default": {},
+      "doc": "Additional event metadata as key-value pairs"
+    },
+    {
+      "name": "resourceUsage",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "ResourceUsage",
+          "fields": [
+            {
+              "name": "cpuUsagePercent",
+              "type": ["null", "double"],
+              "default": null,
+              "doc": "CPU usage percentage (0-100)"
+            },
+            {
+              "name": "memoryUsageMB",
+              "type": ["null", "long"],
+              "default": null,
+              "doc": "Memory usage in megabytes"
+            },
+            {
+              "name": "diskUsageMB",
+              "type": ["null", "long"],
+              "default": null,
+              "doc": "Disk usage in megabytes"
+            },
+            {
+              "name": "networkBytesSent",
+              "type": ["null", "long"],
+              "default": null,
+              "doc": "Network bytes sent since last report"
+            },
+            {
+              "name": "networkBytesReceived",
+              "type": ["null", "long"],
+              "default": null,
+              "doc": "Network bytes received since last report"
+            }
+          ]
+        }
+      ],
+      "default": null,
+      "doc": "Resource usage metrics for the agent"
+    },
+    {
+      "name": "taskId",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "ID of associated task (for task-related events)"
+    },
+    {
+      "name": "errorDetails",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "ErrorDetails",
+          "fields": [
+            {
+              "name": "errorCode",
+              "type": "string",
+              "doc": "Error classification code"
+            },
+            {
+              "name": "errorMessage",
+              "type": "string",
+              "doc": "Error description"
+            },
+            {
+              "name": "stackTrace",
+              "type": ["null", "string"],
+              "default": null,
+              "doc": "Stack trace for debugging"
+            },
+            {
+              "name": "severity",
+              "type": {
+                "type": "enum",
+                "name": "ErrorSeverity",
+                "symbols": [
+                  "LOW",
+                  "MEDIUM",
+                  "HIGH",
+                  "CRITICAL"
+                ]
+              },
+              "doc": "Error severity level"
+            }
+          ]
+        }
+      ],
+      "default": null,
+      "doc": "Error details for error events"
+    }
+  ]
+} 

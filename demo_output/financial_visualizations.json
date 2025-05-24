@@ -1,0 +1,953 @@
+{
+  "dashboard": {
+    "config": {
+      "title": "DORA Compliance Detailed Financial Analysis",
+      "layout": "tabs",
+      "columns": 2,
+      "theme": "light",
+      "export_enabled": true,
+      "interactive": true
+    },
+    "charts": [
+      {
+        "type": "bar",
+        "title": "Regulatory Penalty Risk",
+        "data": {
+          "labels": [
+            "Maximum Penalty Risk",
+            "Expected Annual Penalty",
+            "Risk-Free Scenario"
+          ],
+          "datasets": [
+            {
+              "label": "Penalty Exposure (\u20ac)",
+              "data": [
+                10000000,
+                3000000,
+                0
+              ],
+              "backgroundColor": [
+                "#ff6b6b",
+                "#dc3545",
+                "#27ae60"
+              ],
+              "borderColor": "#ffffff",
+              "borderWidth": 2
+            }
+          ]
+        },
+        "options": {
+          "responsive": true,
+          "plugins": {
+            "legend": {
+              "display": true
+            },
+            "title": {
+              "display": true,
+              "text": "Regulatory Penalty Risk"
+            }
+          },
+          "scales": {
+            "y": {
+              "beginAtZero": true,
+              "grid": {
+                "display": true
+              },
+              "ticks": {
+                "callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"
+              }
+            }
+          }
+        },
+        "config": {
+          "title": "Regulatory Penalty Risk",
+          "chart_type": "bar",
+          "width": 600,
+          "height": 300,
+          "show_legend": true,
+          "show_grid": true,
+          "color_scheme": "corporate",
+          "animation": true,
+          "responsive": true
+        }
+      },
+      {
+        "type": "line",
+        "title": "Return on Investment Timeline",
+        "data": {
+          "labels": [
+            "Year 0",
+            "Year 1",
+            "Year 2",
+            "Year 3",
+            "Year 4",
+            "Year 5"
+          ],
+          "datasets": [
+            {
+              "label": "Annual Cash Flow (\u20ac)",
+              "data": [
+                -279300,
+                50000,
+                10050000,
+                50000,
+                50000,
+                50000
+              ],
+              "borderColor": "#3498db",
+              "backgroundColor": "#3498db20",
+              "yAxisID": "y"
+            },
+            {
+              "label": "Cumulative Cash Flow (\u20ac)",
+              "data": [
+                -279300,
+                -229300,
+                9820700,
+                9870700,
+                9920700,
+                9970700
+              ],
+              "borderColor": "#27ae60",
+              "backgroundColor": "#27ae6020",
+              "yAxisID": "y1"
+            }
+          ]
+        },
+        "options": {
+          "responsive": true,
+          "interaction": {
+            "intersect": false
+          },
+          "plugins": {
+            "legend": {
+              "display": true
+            },
+            "title": {
+              "display": true,
+              "text": "Return on Investment Timeline"
+            }
+          },
+          "scales": {
+            "y": {
+              "type": "linear",
+              "display": true,
+              "position": "left",
+              "grid": {
+                "display": true
+              },
+              "ticks": {
+                "callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"
+              }
+            },
+            "y1": {
+              "type": "linear",
+              "display": true,
+              "position": "right",
+              "grid": {
+                "drawOnChartArea": false
+              },
+              "ticks": {
+                "callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"
+              }
+            }
+          }
+        },
+        "config": {
+          "title": "Return on Investment Timeline",
+          "chart_type": "line",
+          "width": 600,
+          "height": 300,
+          "show_legend": true,
+          "show_grid": true,
+          "color_scheme": "corporate",
+          "animation": true,
+          "responsive": true
+        }
+      },
+      {
+        "type": "pie",
+        "title": "Implementation Investment Breakdown",
+        "data": {
+          "labels": [
+            "Software",
+            "Personnel",
+            "Consulting",
+            "Training",
+            "Hardware"
+          ],
+          "datasets": [
+            {
+              "data": [
+                150000.0,
+                120000.0,
+                80000.0,
+                30000.0,
+                19000.0
+              ],
+              "backgroundColor": [
+                "#3498db",
+                "#6c757d",
+                "#e67e22",
+                "#9b59b6",
+                "#dc3545"
+              ],
+              "borderColor": "#ffffff",
+              "borderWidth": 2,
+              "hoverOffset": 4
+            }
+          ]
+        },
+        "options": {
+          "responsive": true,
+          "plugins": {
+            "legend": {
+              "display": true,
+              "position": "right"
+            },
+            "title": {
+              "display": true,
+              "text": "Implementation Investment Breakdown"
+            },
+            "tooltip": {
+              "callbacks": {
+                "label": "function(context) { return context.label + ': \u20ac' + context.parsed.toLocaleString(); }"
+              }
+            }
+          }
+        },
+        "config": {
+          "title": "Implementation Investment Breakdown",
+          "chart_type": "pie",
+          "width": 600,
+          "height": 300,
+          "show_legend": true,
+          "show_grid": true,
+          "color_scheme": "corporate",
+          "animation": true,
+          "responsive": true
+        }
+      },
+      {
+        "type": "doughnut",
+        "title": "Investment Success Probability",
+        "data": {
+          "labels": [
+            "Success Probability",
+            "Risk"
+          ],
+          "datasets": [
+            {
+              "data": [
+                100.0,
+                0.0
+              ],
+              "backgroundColor": [
+                "#27ae60",
+                "#e74c3c"
+              ],
+              "borderWidth": 0,
+              "cutout": "70%"
+            }
+          ]
+        },
+        "options": {
+          "responsive": true,
+          "plugins": {
+            "legend": {
+              "display": true
+            },
+            "title": {
+              "display": true,
+              "text": "Investment Success Probability"
+            },
+            "tooltip": {
+              "callbacks": {
+                "label": "function(context) { return context.label + ': ' + context.parsed + '%'; }"
+              }
+            }
+          }
+        },
+        "config": {
+          "title": "Investment Success Probability",
+          "chart_type": "donut",
+          "width": 600,
+          "height": 300,
+          "show_legend": true,
+          "show_grid": true,
+          "color_scheme": "corporate",
+          "animation": true,
+          "responsive": true
+        }
+      },
+      {
+        "type": "bar",
+        "title": "Sensitivity Analysis - Impact on NPV",
+        "data": {
+          "labels": [
+            "Benefits",
+            "Costs",
+            "Discount Rate"
+          ],
+          "datasets": [
+            {
+              "label": "Negative Impact",
+              "data": [
+                -2000000,
+                -600000,
+                -300000
+              ],
+              "backgroundColor": "#e74c3c",
+              "borderColor": "#e74c3c",
+              "borderWidth": 1
+            },
+            {
+              "label": "Positive Impact",
+              "data": [
+                2000000,
+                600000,
+                300000
+              ],
+              "backgroundColor": "#27ae60",
+              "borderColor": "#27ae60",
+              "borderWidth": 1
+            }
+          ]
+        },
+        "options": {
+          "indexAxis": "y",
+          "responsive": true,
+          "plugins": {
+            "legend": {
+              "display": true
+            },
+            "title": {
+              "display": true,
+              "text": "Sensitivity Analysis - Impact on NPV"
+            }
+          },
+          "scales": {
+            "x": {
+              "stacked": true,
+              "grid": {
+                "display": true
+              },
+              "ticks": {
+                "callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"
+              }
+            },
+            "y": {
+              "stacked": true
+            }
+          }
+        },
+        "config": {
+          "title": "Sensitivity Analysis - Impact on NPV",
+          "chart_type": "bar",
+          "width": 800,
+          "height": 400,
+          "show_legend": true,
+          "show_grid": true,
+          "color_scheme": "corporate",
+          "animation": true,
+          "responsive": true
+        }
+      },
+      {
+        "type": "bar",
+        "title": "Scenario Analysis Comparison",
+        "data": {
+          "labels": [
+            "Pessimistic",
+            "Most Likely",
+            "Optimistic"
+          ],
+          "datasets": [
+            {
+              "label": "Benefits (\u20ac)",
+              "data": [
+                7000000,
+                10000000,
+                13000000
+              ],
+              "backgroundColor": "#27ae60",
+              "yAxisID": "y"
+            },
+            {
+              "label": "Costs (\u20ac)",
+              "data": [
+                519000,
+                399000,
+                319000
+              ],
+              "backgroundColor": "#dc3545",
+              "yAxisID": "y"
+            },
+            {
+              "label": "NPV (\u20ac)",
+              "data": [
+                4920843,
+                5480424,
+                6633495
+              ],
+              "type": "line",
+              "borderColor": "#20c997",
+              "backgroundColor": "#20c99720",
+              "yAxisID": "y1"
+            }
+          ]
+        },
+        "options": {
+          "responsive": true,
+          "plugins": {
+            "legend": {
+              "display": true
+            },
+            "title": {
+              "display": true,
+              "text": "Scenario Analysis Comparison"
+            }
+          },
+          "scales": {
+            "y": {
+              "type": "linear",
+              "display": true,
+              "position": "left",
+              "grid": {
+                "display": true
+              },
+              "ticks": {
+                "callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"
+              }
+            },
+            "y1": {
+              "type": "linear",
+              "display": true,
+              "position": "right",
+              "grid": {
+                "drawOnChartArea": false
+              },
+              "ticks": {
+                "callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"
+              }
+            }
+          }
+        },
+        "config": {
+          "title": "Scenario Analysis Comparison",
+          "chart_type": "bar",
+          "width": 800,
+          "height": 400,
+          "show_legend": true,
+          "show_grid": true,
+          "color_scheme": "corporate",
+          "animation": true,
+          "responsive": true
+        }
+      }
+    ],
+    "key_metrics": {
+      "max_penalty_risk": "\u20ac10,000,000",
+      "implementation_cost": "\u20ac399,000",
+      "roi_percentage": "2431%",
+      "npv": "\u20ac5,480,424",
+      "payback_period": "6.1 years",
+      "recommendation": "STRONGLY RECOMMENDED"
+    },
+    "detailed_analysis": {
+      "cash_flow_summary": {},
+      "risk_metrics": {
+        "probability_positive_npv": 1.0,
+        "worst_case_npv": 5655235,
+        "best_case_npv": 9628937
+      },
+      "sensitivity_insights": {
+        "most_impactful_variable": "Benefits",
+        "least_impactful_variable": "Discount Rate",
+        "key_risks": [
+          "Benefits: \u20ac3,000,000 impact range",
+          "Costs: \u20ac800,000 impact range",
+          "Discount Rate: \u20ac500,000 impact range"
+        ],
+        "optimization_opportunities": []
+      }
+    },
+    "summary": {
+      "total_charts": 6,
+      "dashboard_type": "analytical",
+      "generation_timestamp": "2025-05-24T11:04:14.477869"
+    }
+  },
+  "individual_charts": {
+    "chart_1_regulatory_penalty_risk": {
+      "type": "bar",
+      "title": "Regulatory Penalty Risk",
+      "data": {
+        "labels": [
+          "Maximum Penalty Risk",
+          "Expected Annual Penalty",
+          "Risk-Free Scenario"
+        ],
+        "datasets": [
+          {
+            "label": "Penalty Exposure (\u20ac)",
+            "data": [
+              10000000,
+              3000000,
+              0
+            ],
+            "backgroundColor": [
+              "#ff6b6b",
+              "#dc3545",
+              "#27ae60"
+            ],
+            "borderColor": "#ffffff",
+            "borderWidth": 2
+          }
+        ]
+      },
+      "options": {
+        "responsive": true,
+        "plugins": {
+          "legend": {
+            "display": true
+          },
+          "title": {
+            "display": true,
+            "text": "Regulatory Penalty Risk"
+          }
+        },
+        "scales": {
+          "y": {
+            "beginAtZero": true,
+            "grid": {
+              "display": true
+            },
+            "ticks": {
+              "callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"
+            }
+          }
+        }
+      },
+      "config": {
+        "title": "Regulatory Penalty Risk",
+        "chart_type": "bar",
+        "width": 600,
+        "height": 300,
+        "show_legend": true,
+        "show_grid": true,
+        "color_scheme": "corporate",
+        "animation": true,
+        "responsive": true
+      }
+    },
+    "chart_2_return_on_investment_timeline": {
+      "type": "line",
+      "title": "Return on Investment Timeline",
+      "data": {
+        "labels": [
+          "Year 0",
+          "Year 1",
+          "Year 2",
+          "Year 3",
+          "Year 4",
+          "Year 5"
+        ],
+        "datasets": [
+          {
+            "label": "Annual Cash Flow (\u20ac)",
+            "data": [
+              -279300,
+              50000,
+              10050000,
+              50000,
+              50000,
+              50000
+            ],
+            "borderColor": "#3498db",
+            "backgroundColor": "#3498db20",
+            "yAxisID": "y"
+          },
+          {
+            "label": "Cumulative Cash Flow (\u20ac)",
+            "data": [
+              -279300,
+              -229300,
+              9820700,
+              9870700,
+              9920700,
+              9970700
+            ],
+            "borderColor": "#27ae60",
+            "backgroundColor": "#27ae6020",
+            "yAxisID": "y1"
+          }
+        ]
+      },
+      "options": {
+        "responsive": true,
+        "interaction": {
+          "intersect": false
+        },
+        "plugins": {
+          "legend": {
+            "display": true
+          },
+          "title": {
+            "display": true,
+            "text": "Return on Investment Timeline"
+          }
+        },
+        "scales": {
+          "y": {
+            "type": "linear",
+            "display": true,
+            "position": "left",
+            "grid": {
+              "display": true
+            },
+            "ticks": {
+              "callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"
+            }
+          },
+          "y1": {
+            "type": "linear",
+            "display": true,
+            "position": "right",
+            "grid": {
+              "drawOnChartArea": false
+            },
+            "ticks": {
+              "callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"
+            }
+          }
+        }
+      },
+      "config": {
+        "title": "Return on Investment Timeline",
+        "chart_type": "line",
+        "width": 600,
+        "height": 300,
+        "show_legend": true,
+        "show_grid": true,
+        "color_scheme": "corporate",
+        "animation": true,
+        "responsive": true
+      }
+    },
+    "chart_3_implementation_investment_breakdown": {
+      "type": "pie",
+      "title": "Implementation Investment Breakdown",
+      "data": {
+        "labels": [
+          "Software",
+          "Personnel",
+          "Consulting",
+          "Training",
+          "Hardware"
+        ],
+        "datasets": [
+          {
+            "data": [
+              150000.0,
+              120000.0,
+              80000.0,
+              30000.0,
+              19000.0
+            ],
+            "backgroundColor": [
+              "#3498db",
+              "#6c757d",
+              "#e67e22",
+              "#9b59b6",
+              "#dc3545"
+            ],
+            "borderColor": "#ffffff",
+            "borderWidth": 2,
+            "hoverOffset": 4
+          }
+        ]
+      },
+      "options": {
+        "responsive": true,
+        "plugins": {
+          "legend": {
+            "display": true,
+            "position": "right"
+          },
+          "title": {
+            "display": true,
+            "text": "Implementation Investment Breakdown"
+          },
+          "tooltip": {
+            "callbacks": {
+              "label": "function(context) { return context.label + ': \u20ac' + context.parsed.toLocaleString(); }"
+            }
+          }
+        }
+      },
+      "config": {
+        "title": "Implementation Investment Breakdown",
+        "chart_type": "pie",
+        "width": 600,
+        "height": 300,
+        "show_legend": true,
+        "show_grid": true,
+        "color_scheme": "corporate",
+        "animation": true,
+        "responsive": true
+      }
+    },
+    "chart_4_investment_success_probability": {
+      "type": "doughnut",
+      "title": "Investment Success Probability",
+      "data": {
+        "labels": [
+          "Success Probability",
+          "Risk"
+        ],
+        "datasets": [
+          {
+            "data": [
+              100.0,
+              0.0
+            ],
+            "backgroundColor": [
+              "#27ae60",
+              "#e74c3c"
+            ],
+            "borderWidth": 0,
+            "cutout": "70%"
+          }
+        ]
+      },
+      "options": {
+        "responsive": true,
+        "plugins": {
+          "legend": {
+            "display": true
+          },
+          "title": {
+            "display": true,
+            "text": "Investment Success Probability"
+          },
+          "tooltip": {
+            "callbacks": {
+              "label": "function(context) { return context.label + ': ' + context.parsed + '%'; }"
+            }
+          }
+        }
+      },
+      "config": {
+        "title": "Investment Success Probability",
+        "chart_type": "donut",
+        "width": 600,
+        "height": 300,
+        "show_legend": true,
+        "show_grid": true,
+        "color_scheme": "corporate",
+        "animation": true,
+        "responsive": true
+      }
+    },
+    "chart_5_sensitivity_analysis_-_impact_on_npv": {
+      "type": "bar",
+      "title": "Sensitivity Analysis - Impact on NPV",
+      "data": {
+        "labels": [
+          "Benefits",
+          "Costs",
+          "Discount Rate"
+        ],
+        "datasets": [
+          {
+            "label": "Negative Impact",
+            "data": [
+              -2000000,
+              -600000,
+              -300000
+            ],
+            "backgroundColor": "#e74c3c",
+            "borderColor": "#e74c3c",
+            "borderWidth": 1
+          },
+          {
+            "label": "Positive Impact",
+            "data": [
+              2000000,
+              600000,
+              300000
+            ],
+            "backgroundColor": "#27ae60",
+            "borderColor": "#27ae60",
+            "borderWidth": 1
+          }
+        ]
+      },
+      "options": {
+        "indexAxis": "y",
+        "responsive": true,
+        "plugins": {
+          "legend": {
+            "display": true
+          },
+          "title": {
+            "display": true,
+            "text": "Sensitivity Analysis - Impact on NPV"
+          }
+        },
+        "scales": {
+          "x": {
+            "stacked": true,
+            "grid": {
+              "display": true
+            },
+            "ticks": {
+              "callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"
+            }
+          },
+          "y": {
+            "stacked": true
+          }
+        }
+      },
+      "config": {
+        "title": "Sensitivity Analysis - Impact on NPV",
+        "chart_type": "bar",
+        "width": 800,
+        "height": 400,
+        "show_legend": true,
+        "show_grid": true,
+        "color_scheme": "corporate",
+        "animation": true,
+        "responsive": true
+      }
+    },
+    "chart_6_scenario_analysis_comparison": {
+      "type": "bar",
+      "title": "Scenario Analysis Comparison",
+      "data": {
+        "labels": [
+          "Pessimistic",
+          "Most Likely",
+          "Optimistic"
+        ],
+        "datasets": [
+          {
+            "label": "Benefits (\u20ac)",
+            "data": [
+              7000000,
+              10000000,
+              13000000
+            ],
+            "backgroundColor": "#27ae60",
+            "yAxisID": "y"
+          },
+          {
+            "label": "Costs (\u20ac)",
+            "data": [
+              519000,
+              399000,
+              319000
+            ],
+            "backgroundColor": "#dc3545",
+            "yAxisID": "y"
+          },
+          {
+            "label": "NPV (\u20ac)",
+            "data": [
+              4920843,
+              5480424,
+              6633495
+            ],
+            "type": "line",
+            "borderColor": "#20c997",
+            "backgroundColor": "#20c99720",
+            "yAxisID": "y1"
+          }
+        ]
+      },
+      "options": {
+        "responsive": true,
+        "plugins": {
+          "legend": {
+            "display": true
+          },
+          "title": {
+            "display": true,
+            "text": "Scenario Analysis Comparison"
+          }
+        },
+        "scales": {
+          "y": {
+            "type": "linear",
+            "display": true,
+            "position": "left",
+            "grid": {
+              "display": true
+            },
+            "ticks": {
+              "callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"
+            }
+          },
+          "y1": {
+            "type": "linear",
+            "display": true,
+            "position": "right",
+            "grid": {
+              "drawOnChartArea": false
+            },
+            "ticks": {
+              "callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"
+            }
+          }
+        }
+      },
+      "config": {
+        "title": "Scenario Analysis Comparison",
+        "chart_type": "bar",
+        "width": 800,
+        "height": 400,
+        "show_legend": true,
+        "show_grid": true,
+        "color_scheme": "corporate",
+        "animation": true,
+        "responsive": true
+      }
+    }
+  },
+  "export_options": {
+    "formats": [
+      "html",
+      "svg",
+      "png",
+      "pdf",
+      "json"
+    ],
+    "sizes": [
+      "small",
+      "medium",
+      "large",
+      "custom"
+    ],
+    "themes": [
+      "light",
+      "dark",
+      "corporate"
+    ]
+  },
+  "metadata": {
+    "generation_timestamp": "2025-05-24T11:04:14.477878",
+    "visualization_level": "analytical",
+    "total_charts": 6,
+    "data_sources": [
+      "penalty_analysis",
+      "implementation_cost",
+      "advanced_roi_analysis",
+      "risk_metrics",
+      "cash_flow_analysis",
+      "sensitivity_analysis",
+      "investment_recommendation"
+    ]
+  }
+}

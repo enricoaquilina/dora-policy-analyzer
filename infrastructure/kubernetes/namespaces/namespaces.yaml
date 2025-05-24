@@ -1,0 +1,187 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dora-system
+  labels:
+    name: dora-system
+    environment: all
+    app.kubernetes.io/part-of: dora-compliance
+  annotations:
+    description: "Core DORA compliance system components"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dora-agents
+  labels:
+    name: dora-agents
+    environment: all
+    app.kubernetes.io/part-of: dora-compliance
+  annotations:
+    description: "DORA compliance AI/ML agents"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dora-data
+  labels:
+    name: dora-data
+    environment: all
+    app.kubernetes.io/part-of: dora-compliance
+  annotations:
+    description: "Databases and persistent storage"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dora-monitoring
+  labels:
+    name: dora-monitoring
+    environment: all
+    app.kubernetes.io/part-of: dora-compliance
+  annotations:
+    description: "Monitoring, logging, and observability stack"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dora-security
+  labels:
+    name: dora-security
+    environment: all
+    app.kubernetes.io/part-of: dora-compliance
+  annotations:
+    description: "Security tools and compliance scanners"
+---
+# Resource quotas for namespaces
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: dora-system-quota
+  namespace: dora-system
+spec:
+  hard:
+    requests.cpu: "100"
+    requests.memory: "200Gi"
+    limits.cpu: "200"
+    limits.memory: "400Gi"
+    persistentvolumeclaims: "20"
+    services: "50"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: dora-agents-quota
+  namespace: dora-agents
+spec:
+  hard:
+    requests.cpu: "500"
+    requests.memory: "1Ti"
+    limits.cpu: "1000"
+    limits.memory: "2Ti"
+    persistentvolumeclaims: "50"
+    services: "100"
+    nvidia.com/gpu: "10"  # GPU quota for ML workloads
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: dora-data-quota
+  namespace: dora-data
+spec:
+  hard:
+    requests.cpu: "200"
+    requests.memory: "500Gi"
+    limits.cpu: "400"
+    limits.memory: "1Ti"
+    persistentvolumeclaims: "100"
+    services: "20"
+---
+# Network policies for namespace isolation
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: dora-system
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: dora-agents
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: dora-data
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+# Allow DNS resolution in all namespaces
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: dora-system
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: dora-agents
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: dora-data
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53 

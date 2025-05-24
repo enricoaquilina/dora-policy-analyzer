@@ -1,0 +1,605 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - DORA Policy Analyzer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card text-center fade-in-up">
+                <div class="card-body py-5">
+                    <h1 class="display-4 fw-bold text-primary mb-3">
+                        <i class="fas fa-shield-alt me-3"></i>
+                        DORA Policy Analyzer
+                    </h1>
+                    <p class="lead mb-4">
+                        AI-Powered Digital Operational Resilience Act Compliance Assessment
+                    </p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <p class="mb-4">
+                                Transform weeks of manual compliance assessment into minutes of automated analysis. 
+                                Our AI-powered platform analyzes your policy documents against all 5 DORA pillars, 
+                                providing executive-ready reports with actionable insights.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="{{ url_for('upload_page') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-upload me-2"></i>Analyze Policy Document
+                        </a>
+                        <button class="btn btn-outline-primary btn-lg" onclick="loadDemoData()">
+                            <i class="fas fa-play me-2"></i>View Live Demo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Features -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-5 text-white">
+                <i class="fas fa-star me-2"></i>Key Capabilities
+            </h2>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="metric-card fade-in-up h-100">
+                <div class="metric-value text-primary">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h5 class="fw-bold">30-Second Analysis</h5>
+                <p class="text-muted mb-0">
+                    Upload any policy document and receive comprehensive DORA compliance assessment in under 30 seconds
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="metric-card fade-in-up h-100">
+                <div class="metric-value text-success">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h5 class="fw-bold">AI-Powered Intelligence</h5>
+                <p class="text-muted mb-0">
+                    Advanced NLP models (Claude, GPT-4) provide human-level regulatory interpretation and analysis
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="metric-card fade-in-up h-100">
+                <div class="metric-value text-warning">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h5 class="fw-bold">Executive Reports</h5>
+                <p class="text-muted mb-0">
+                    Clear RAG status, compliance percentages, and prioritized remediation roadmaps ready for board presentation
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- DORA Pillars Overview -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card fade-in-up">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-columns me-2"></i>
+                        DORA Compliance Pillars
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6 mb-3">
+                            <div class="d-flex align-items-center p-3 bg-light rounded">
+                                <div class="me-3 text-primary">
+                                    <i class="fas fa-cogs fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Pillar 1: ICT Risk Management & Governance</h6>
+                                    <small class="text-muted">Board oversight, risk frameworks, and governance arrangements</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-6 mb-3">
+                            <div class="d-flex align-items-center p-3 bg-light rounded">
+                                <div class="me-3 text-danger">
+                                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Pillar 2: ICT-Related Incident Management</h6>
+                                    <small class="text-muted">Incident classification, response, and reporting procedures</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-6 mb-3">
+                            <div class="d-flex align-items-center p-3 bg-light rounded">
+                                <div class="me-3 text-info">
+                                    <i class="fas fa-vial fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Pillar 3: Digital Operational Resilience Testing</h6>
+                                    <small class="text-muted">TLPT, vulnerability assessments, and resilience testing</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-6 mb-3">
+                            <div class="d-flex align-items-center p-3 bg-light rounded">
+                                <div class="me-3 text-warning">
+                                    <i class="fas fa-handshake fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Pillar 4: ICT Third-Party Risk Management</h6>
+                                    <small class="text-muted">Vendor risk assessment, concentration risk, and oversight</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-12 mb-3">
+                            <div class="d-flex align-items-center p-3 bg-light rounded">
+                                <div class="me-3 text-success">
+                                    <i class="fas fa-share-alt fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Pillar 5: Information & Intelligence Sharing</h6>
+                                    <small class="text-muted">Cyber threat intelligence sharing and collaborative security</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Dashboard (Hidden by default) -->
+    <div id="demo-dashboard" class="d-none">
+        <!-- Demo Overview -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-chart-pie me-2"></i>
+                            Demo: ICT Risk Management Policy Analysis
+                        </h4>
+                        <button class="btn btn-outline-light btn-sm" onclick="hideDemoData()">
+                            <i class="fas fa-times"></i> Close Demo
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <div class="metric-value rag-amber">73.2%</div>
+                                    <div class="metric-label">Overall Compliance</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <div class="metric-value rag-amber">AMBER</div>
+                                    <div class="metric-label">RAG Status</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <div class="metric-value text-danger">2</div>
+                                    <div class="metric-label">Critical Gaps</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <div class="metric-value text-primary">24.7s</div>
+                                    <div class="metric-label">Processing Time</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Pillar Breakdown -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Pillar Assessment Results
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Pillar</th>
+                                        <th>Score</th>
+                                        <th>Status</th>
+                                        <th>Key Finding</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="demo-pillars-table">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Critical Gaps -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Critical & High Priority Gaps
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Article</th>
+                                        <th>Gap Description</th>
+                                        <th>Severity</th>
+                                        <th>Timeline</th>
+                                        <th>Investment</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="demo-gaps-table">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Actions -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="mb-3">Ready to analyze your own policies?</h5>
+                        <a href="{{ url_for('upload_page') }}" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-upload me-2"></i>Upload Your Policy Document
+                        </a>
+                        <button class="btn btn-outline-primary btn-lg" onclick="loadFullDashboard()">
+                            <i class="fas fa-chart-line me-2"></i>View Detailed Dashboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Getting Started -->
+    <div class="row mb-5" id="getting-started">
+        <div class="col-12">
+            <div class="card fade-in-up">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-rocket me-2"></i>
+                        Getting Started
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="text-primary mb-3">
+                                <i class="fas fa-upload fa-3x"></i>
+                            </div>
+                            <h5>1. Upload Document</h5>
+                            <p class="text-muted">
+                                Upload your policy document (PDF, DOCX, TXT) for automated DORA compliance analysis
+                            </p>
+                        </div>
+                        
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="text-success mb-3">
+                                <i class="fas fa-cogs fa-3x"></i>
+                            </div>
+                            <h5>2. AI Analysis</h5>
+                            <p class="text-muted">
+                                Our AI models analyze your document against 25+ DORA requirements across all 5 pillars
+                            </p>
+                        </div>
+                        
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="text-warning mb-3">
+                                <i class="fas fa-chart-pie fa-3x"></i>
+                            </div>
+                            <h5>3. Executive Report</h5>
+                            <p class="text-muted">
+                                Receive comprehensive compliance report with RAG status, gaps, and remediation roadmap
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let demoData = null;
+
+    async function loadDemoData() {
+        try {
+            // Show loading message
+            showAlert('Loading demo data...', 'info');
+            
+            const response = await fetch('/api/demo-data');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            demoData = await response.json();
+            console.log('Demo data loaded:', demoData);
+            
+            // Hide getting started section
+            document.getElementById('getting-started').classList.add('d-none');
+            
+            // Show demo dashboard
+            document.getElementById('demo-dashboard').classList.remove('d-none');
+            
+            // Populate demo data
+            populateDemoPillars();
+            populateDemoGaps();
+            
+            // Hide loading message
+            hideAlert();
+            
+            // Scroll to demo
+            document.getElementById('demo-dashboard').scrollIntoView({ behavior: 'smooth' });
+            
+        } catch (error) {
+            console.error('Error loading demo data:', error);
+            showAlert(`Error loading demo data: ${error.message}`, 'danger');
+        }
+    }
+
+    function hideDemoData() {
+        // Hide demo dashboard
+        document.getElementById('demo-dashboard').classList.add('d-none');
+        
+        // Show getting started section
+        document.getElementById('getting-started').classList.remove('d-none');
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function populateDemoPillars() {
+        const tbody = document.getElementById('demo-pillars-table');
+        tbody.innerHTML = '';
+        
+        // Extract pillar data from the actual backend structure
+        const pillars = [
+            {
+                name: 'ICT Governance',
+                score: demoData.dora_compliance?.ict_governance?.score || 0,
+                status: demoData.dora_compliance?.ict_governance?.status || 'UNKNOWN',
+                finding: 'Strong governance structure with clear accountability'
+            },
+            {
+                name: 'ICT Risk Management',
+                score: demoData.dora_compliance?.ict_risk_management?.score || 0,
+                status: demoData.dora_compliance?.ict_risk_management?.status || 'UNKNOWN',
+                finding: 'Good process framework, missing automated tools'
+            },
+            {
+                name: 'Incident Management',
+                score: demoData.dora_compliance?.ict_incident_management?.score || 0,
+                status: demoData.dora_compliance?.ict_incident_management?.status || 'UNKNOWN',
+                finding: 'Process documented, classification criteria unclear'
+            },
+            {
+                name: 'Resilience Testing',
+                score: demoData.dora_compliance?.digital_operational_resilience_testing?.score || 0,
+                status: demoData.dora_compliance?.digital_operational_resilience_testing?.status || 'UNKNOWN',
+                finding: 'Ad-hoc testing only, no comprehensive programme'
+            },
+            {
+                name: 'Third-Party Risk',
+                score: demoData.dora_compliance?.ict_third_party_risk?.score || 0,
+                status: demoData.dora_compliance?.ict_third_party_risk?.status || 'UNKNOWN',
+                finding: 'Strong vendor management with clear contractual requirements'
+            },
+            {
+                name: 'Information Sharing',
+                score: demoData.dora_compliance?.information_sharing?.score || 0,
+                status: demoData.dora_compliance?.information_sharing?.status || 'UNKNOWN',
+                finding: 'No formal sharing arrangements, limited threat intelligence'
+            }
+        ];
+        
+        pillars.forEach(pillar => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>${pillar.name}</strong></td>
+                <td><strong>${formatPercentage(pillar.score)}</strong></td>
+                <td><span class="badge ${getStatusBadgeClass(pillar.status)}">${pillar.status}</span></td>
+                <td>${pillar.finding}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function populateDemoGaps() {
+        const tbody = document.getElementById('demo-gaps-table');
+        tbody.innerHTML = '';
+        
+        // Extract gap data from the actual backend structure
+        let gaps = [];
+        
+        // Get critical gaps
+        if (demoData.gap_analysis?.critical_gaps) {
+            demoData.gap_analysis.critical_gaps.forEach(gap => {
+                gaps.push({
+                    article: gap.dora_reference || gap.id,
+                    description: gap.description,
+                    severity: 'CRITICAL',
+                    timeline: gap.effort_estimate || 'TBD',
+                    investment: gap.investment_estimate || 'TBD'
+                });
+            });
+        }
+        
+        // Get high priority gaps
+        if (demoData.gap_analysis?.high_priority_gaps) {
+            demoData.gap_analysis.high_priority_gaps.forEach(gap => {
+                gaps.push({
+                    article: gap.dora_reference || gap.id,
+                    description: gap.description,
+                    severity: 'HIGH',
+                    timeline: gap.effort_estimate || 'TBD',
+                    investment: gap.investment_estimate || 'TBD'
+                });
+            });
+        }
+        
+        // If no gaps from gap_analysis, create demo gaps
+        if (gaps.length === 0) {
+            gaps = [
+                {
+                    article: 'Art. 24-25',
+                    description: 'No comprehensive digital operational resilience testing programme in place',
+                    severity: 'CRITICAL',
+                    timeline: '6-9 months',
+                    investment: '€250,000 - €400,000'
+                },
+                {
+                    article: 'Art. 45-46',
+                    description: 'No cyber threat information sharing arrangements with authorities or peers',
+                    severity: 'CRITICAL',
+                    timeline: '3-4 months',
+                    investment: '€80,000 - €120,000'
+                },
+                {
+                    article: 'Art. 8-9',
+                    description: 'Continuous monitoring and automated risk assessment tools missing',
+                    severity: 'HIGH',
+                    timeline: '4-6 months',
+                    investment: '€180,000 - €280,000'
+                }
+            ];
+        }
+        
+        gaps.forEach(gap => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>${gap.article}</strong></td>
+                <td>${gap.description}</td>
+                <td><span class="badge ${getSeverityBadgeClass(gap.severity)}">${gap.severity}</span></td>
+                <td>${gap.timeline}</td>
+                <td>${gap.investment}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function formatPercentage(value) {
+        if (typeof value === 'number') {
+            return `${value.toFixed(1)}%`;
+        }
+        return `${value}%`;
+    }
+
+    function getStatusBadgeClass(status) {
+        switch(status.toUpperCase()) {
+            case 'GREEN': return 'bg-success';
+            case 'AMBER': return 'bg-warning text-dark';
+            case 'RED': return 'bg-danger';
+            default: return 'bg-secondary';
+        }
+    }
+
+    function getSeverityBadgeClass(severity) {
+        switch(severity.toUpperCase()) {
+            case 'CRITICAL': return 'bg-danger';
+            case 'HIGH': return 'bg-warning text-dark';
+            case 'MEDIUM': return 'bg-info';
+            case 'LOW': return 'bg-success';
+            default: return 'bg-secondary';
+        }
+    }
+
+    function showAlert(message, type = 'info') {
+        // Remove existing alerts
+        const existingAlert = document.querySelector('.alert');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+        
+        // Create new alert
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alert.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        // Insert at top of container
+        const container = document.querySelector('.container');
+        container.insertBefore(alert, container.firstChild);
+    }
+
+    function hideAlert() {
+        const alert = document.querySelector('.alert');
+        if (alert) {
+            alert.remove();
+        }
+    }
+
+    function loadFullDashboard() {
+        // Create a mock analysis ID for demo
+        const demoAnalysisId = 'demo-001';
+        
+        // Store demo data in localStorage for dashboard
+        localStorage.setItem('demoData', JSON.stringify(demoData));
+        
+        // Navigate to dashboard
+        window.location.href = `/dashboard?demo=true`;
+    }
+
+    // Animate cards on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in-up');
+            }
+        });
+    }, observerOptions);
+
+    // Observe all cards
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.card').forEach(card => {
+            observer.observe(card);
+        });
+    });
+</script>
+{% endblock %} 

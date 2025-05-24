@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DORA Compliance Detailed Financial Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            font-size: 14px;
+            color: #666;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .chart-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .recommendation {
+            background: #e8f6f3;
+            border-left: 4px solid #27ae60;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .recommendation.critical {
+            background: #fdf2f2;
+            border-left-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>DORA Compliance Detailed Financial Analysis</h1>
+        <p>Generated on May 24, 2025 at 11:04 AM</p>
+    </div>
+    
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-value">€10,000,000</div>
+            <div class="metric-label">Maximum Penalty Risk</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">€399,000</div>
+            <div class="metric-label">Implementation Investment</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">2431%</div>
+            <div class="metric-label">Return on Investment</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">€5,480,424</div>
+            <div class="metric-label">Net Present Value</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">6.1 years</div>
+            <div class="metric-label">Payback Period</div>
+        </div>
+    </div>
+    
+    <div class="recommendation ">
+        <strong>Investment Recommendation:</strong> STRONGLY RECOMMENDED
+    </div>
+    
+    <div class="charts-grid">
+
+        <div class="chart-container">
+            <div class="chart-title">Regulatory Penalty Risk</div>
+            <canvas id="chart_0" width="600" height="300"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">Return on Investment Timeline</div>
+            <canvas id="chart_1" width="600" height="300"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">Implementation Investment Breakdown</div>
+            <canvas id="chart_2" width="600" height="300"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">Investment Success Probability</div>
+            <canvas id="chart_3" width="600" height="300"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">Sensitivity Analysis - Impact on NPV</div>
+            <canvas id="chart_4" width="800" height="400"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">Scenario Analysis Comparison</div>
+            <canvas id="chart_5" width="800" height="400"></canvas>
+        </div>
+
+    </div>
+    
+    <script>
+        // Chart.js configuration and rendering
+
+        const ctx0 = document.getElementById('chart_0').getContext('2d');
+        const chartConfig0 = {"type": "bar", "title": "Regulatory Penalty Risk", "data": {"labels": ["Maximum Penalty Risk", "Expected Annual Penalty", "Risk-Free Scenario"], "datasets": [{"label": "Penalty Exposure (\u20ac)", "data": [10000000, 3000000, 0], "backgroundColor": ["#ff6b6b", "#dc3545", "#27ae60"], "borderColor": "#ffffff", "borderWidth": 2}]}, "options": {"responsive": true, "plugins": {"legend": {"display": true}, "title": {"display": true, "text": "Regulatory Penalty Risk"}}, "scales": {"y": {"beginAtZero": true, "grid": {"display": true}, "ticks": {"callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"}}}}, "config": {"title": "Regulatory Penalty Risk", "chart_type": "bar", "width": 600, "height": 300, "show_legend": true, "show_grid": true, "color_scheme": "corporate", "animation": true, "responsive": true}};
+        new Chart(ctx0, {
+            type: chartConfig0.type,
+            data: chartConfig0.data,
+            options: chartConfig0.options
+        });
+
+        const ctx1 = document.getElementById('chart_1').getContext('2d');
+        const chartConfig1 = {"type": "line", "title": "Return on Investment Timeline", "data": {"labels": ["Year 0", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5"], "datasets": [{"label": "Annual Cash Flow (\u20ac)", "data": [-279300, 50000, 10050000, 50000, 50000, 50000], "borderColor": "#3498db", "backgroundColor": "#3498db20", "yAxisID": "y"}, {"label": "Cumulative Cash Flow (\u20ac)", "data": [-279300, -229300, 9820700, 9870700, 9920700, 9970700], "borderColor": "#27ae60", "backgroundColor": "#27ae6020", "yAxisID": "y1"}]}, "options": {"responsive": true, "interaction": {"intersect": false}, "plugins": {"legend": {"display": true}, "title": {"display": true, "text": "Return on Investment Timeline"}}, "scales": {"y": {"type": "linear", "display": true, "position": "left", "grid": {"display": true}, "ticks": {"callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"}}, "y1": {"type": "linear", "display": true, "position": "right", "grid": {"drawOnChartArea": false}, "ticks": {"callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"}}}}, "config": {"title": "Return on Investment Timeline", "chart_type": "line", "width": 600, "height": 300, "show_legend": true, "show_grid": true, "color_scheme": "corporate", "animation": true, "responsive": true}};
+        new Chart(ctx1, {
+            type: chartConfig1.type,
+            data: chartConfig1.data,
+            options: chartConfig1.options
+        });
+
+        const ctx2 = document.getElementById('chart_2').getContext('2d');
+        const chartConfig2 = {"type": "pie", "title": "Implementation Investment Breakdown", "data": {"labels": ["Software", "Personnel", "Consulting", "Training", "Hardware"], "datasets": [{"data": [150000.0, 120000.0, 80000.0, 30000.0, 19000.0], "backgroundColor": ["#3498db", "#6c757d", "#e67e22", "#9b59b6", "#dc3545"], "borderColor": "#ffffff", "borderWidth": 2, "hoverOffset": 4}]}, "options": {"responsive": true, "plugins": {"legend": {"display": true, "position": "right"}, "title": {"display": true, "text": "Implementation Investment Breakdown"}, "tooltip": {"callbacks": {"label": "function(context) { return context.label + ': \u20ac' + context.parsed.toLocaleString(); }"}}}}, "config": {"title": "Implementation Investment Breakdown", "chart_type": "pie", "width": 600, "height": 300, "show_legend": true, "show_grid": true, "color_scheme": "corporate", "animation": true, "responsive": true}};
+        new Chart(ctx2, {
+            type: chartConfig2.type,
+            data: chartConfig2.data,
+            options: chartConfig2.options
+        });
+
+        const ctx3 = document.getElementById('chart_3').getContext('2d');
+        const chartConfig3 = {"type": "doughnut", "title": "Investment Success Probability", "data": {"labels": ["Success Probability", "Risk"], "datasets": [{"data": [100.0, 0.0], "backgroundColor": ["#27ae60", "#e74c3c"], "borderWidth": 0, "cutout": "70%"}]}, "options": {"responsive": true, "plugins": {"legend": {"display": true}, "title": {"display": true, "text": "Investment Success Probability"}, "tooltip": {"callbacks": {"label": "function(context) { return context.label + ': ' + context.parsed + '%'; }"}}}}, "config": {"title": "Investment Success Probability", "chart_type": "donut", "width": 600, "height": 300, "show_legend": true, "show_grid": true, "color_scheme": "corporate", "animation": true, "responsive": true}};
+        new Chart(ctx3, {
+            type: chartConfig3.type,
+            data: chartConfig3.data,
+            options: chartConfig3.options
+        });
+
+        const ctx4 = document.getElementById('chart_4').getContext('2d');
+        const chartConfig4 = {"type": "bar", "title": "Sensitivity Analysis - Impact on NPV", "data": {"labels": ["Benefits", "Costs", "Discount Rate"], "datasets": [{"label": "Negative Impact", "data": [-2000000, -600000, -300000], "backgroundColor": "#e74c3c", "borderColor": "#e74c3c", "borderWidth": 1}, {"label": "Positive Impact", "data": [2000000, 600000, 300000], "backgroundColor": "#27ae60", "borderColor": "#27ae60", "borderWidth": 1}]}, "options": {"indexAxis": "y", "responsive": true, "plugins": {"legend": {"display": true}, "title": {"display": true, "text": "Sensitivity Analysis - Impact on NPV"}}, "scales": {"x": {"stacked": true, "grid": {"display": true}, "ticks": {"callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"}}, "y": {"stacked": true}}}, "config": {"title": "Sensitivity Analysis - Impact on NPV", "chart_type": "bar", "width": 800, "height": 400, "show_legend": true, "show_grid": true, "color_scheme": "corporate", "animation": true, "responsive": true}};
+        new Chart(ctx4, {
+            type: chartConfig4.type,
+            data: chartConfig4.data,
+            options: chartConfig4.options
+        });
+
+        const ctx5 = document.getElementById('chart_5').getContext('2d');
+        const chartConfig5 = {"type": "bar", "title": "Scenario Analysis Comparison", "data": {"labels": ["Pessimistic", "Most Likely", "Optimistic"], "datasets": [{"label": "Benefits (\u20ac)", "data": [7000000, 10000000, 13000000], "backgroundColor": "#27ae60", "yAxisID": "y"}, {"label": "Costs (\u20ac)", "data": [519000, 399000, 319000], "backgroundColor": "#dc3545", "yAxisID": "y"}, {"label": "NPV (\u20ac)", "data": [4920843, 5480424, 6633495], "type": "line", "borderColor": "#20c997", "backgroundColor": "#20c99720", "yAxisID": "y1"}]}, "options": {"responsive": true, "plugins": {"legend": {"display": true}, "title": {"display": true, "text": "Scenario Analysis Comparison"}}, "scales": {"y": {"type": "linear", "display": true, "position": "left", "grid": {"display": true}, "ticks": {"callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"}}, "y1": {"type": "linear", "display": true, "position": "right", "grid": {"drawOnChartArea": false}, "ticks": {"callback": "function(value) { return '\u20ac' + value.toLocaleString(); }"}}}}, "config": {"title": "Scenario Analysis Comparison", "chart_type": "bar", "width": 800, "height": 400, "show_legend": true, "show_grid": true, "color_scheme": "corporate", "animation": true, "responsive": true}};
+        new Chart(ctx5, {
+            type: chartConfig5.type,
+            data: chartConfig5.data,
+            options: chartConfig5.options
+        });
+
+    </script>
+</body>
+</html>
