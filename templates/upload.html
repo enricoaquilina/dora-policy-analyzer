@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Document - DORA Compliance System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Upload Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-5 mb-3">
+                <i class="fas fa-upload text-primary me-3"></i>
+                Upload Policy Document
+            </h1>
+            <p class="lead text-muted">
+                Upload your policy documents for AI-powered DORA compliance analysis
+            </p>
+        </div>
+
+        <!-- Upload Form -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-file-upload me-2"></i>Document Upload</h5>
+            </div>
+            <div class="card-body">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label for="fileInput" class="form-label">Select Document</label>
+                        <div class="input-group">
+                            <input type="file" class="form-control" id="fileInput" name="file" 
+                                   accept=".pdf,.docx,.txt,.md" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="clearFile()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            Supported formats: PDF, DOCX, TXT, MD (Max size: 100MB)
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enableAI" checked>
+                                    <label class="form-check-label" for="enableAI">
+                                        <i class="fas fa-robot me-1"></i>
+                                        Enable AI Analysis
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="generateReport" checked>
+                                    <label class="form-check-label" for="generateReport">
+                                        <i class="fas fa-chart-line me-1"></i>
+                                        Generate Executive Report
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg" id="uploadBtn">
+                            <i class="fas fa-upload me-2"></i>
+                            Start Analysis
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Progress Section (Hidden initially) -->
+        <div class="card mt-4" id="progressCard" style="display: none;">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-cog fa-spin me-2"></i>
+                    Analysis Progress
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span id="progressText">Initializing...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             id="progressBar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="step-indicator" id="step1">
+                            <i class="fas fa-upload"></i>
+                            <small class="d-block">Upload</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="step-indicator" id="step2">
+                            <i class="fas fa-search"></i>
+                            <small class="d-block">Analysis</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="step-indicator" id="step3">
+                            <i class="fas fa-chart-line"></i>
+                            <small class="d-block">Assessment</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="step-indicator" id="step4">
+                            <i class="fas fa-check"></i>
+                            <small class="d-block">Complete</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section (Hidden initially) -->
+        <div class="card mt-4" id="resultsCard" style="display: none;">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    Analysis Complete
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Your document has been successfully analyzed!
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <a href="/dashboard" class="btn btn-primary">
+                        <i class="fas fa-chart-line me-2"></i>
+                        View Dashboard
+                    </a>
+                    <button class="btn btn-outline-primary" onclick="uploadAnother()">
+                        <i class="fas fa-plus me-2"></i>
+                        Upload Another
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Need Help?</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-file-alt me-2"></i>Supported Documents</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>ICT Risk Management Policies</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Incident Management Procedures</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Business Continuity Plans</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Third-party Risk Assessments</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-robot me-2"></i>AI Analysis Features</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>47 DORA Requirements Coverage</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Gap Identification & Prioritization</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Financial Impact Modeling</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Implementation Roadmaps</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.step-indicator {
+    padding: 1rem;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+.step-indicator.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.step-indicator.completed {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.file-drop-zone {
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    padding: 3rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.file-drop-zone:hover {
+    border-color: var(--primary-color);
+    background-color: #f8f9fa;
+}
+
+.file-drop-zone.dragover {
+    border-color: var(--success-color);
+    background-color: #d4edda;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentAnalysisId = null;
+let socket = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Socket.IO
+    socket = io();
+    
+    // Socket event listeners
+    socket.on('analysis_progress', function(data) {
+        updateProgress(data);
+    });
+    
+    socket.on('analysis_complete', function(data) {
+        showResults(data);
+    });
+    
+    socket.on('analysis_error', function(data) {
+        showError(data.error);
+    });
+    
+    // Form submission
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        uploadFile();
+    });
+    
+    // File input change
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            validateFile(e.target.files[0]);
+        }
+    });
+});
+
+function uploadFile() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert('Please select a file to upload');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // Show progress card
+    document.getElementById('progressCard').style.display = 'block';
+    document.getElementById('uploadBtn').disabled = true;
+    
+    // Upload file
+    fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        currentAnalysisId = data.analysis_id;
+        updateProgress({
+            stage: 'uploaded',
+            progress: 10,
+            message: 'File uploaded successfully'
+        });
+    })
+    .catch(error => {
+        showError(error.message);
+    });
+}
+
+function updateProgress(data) {
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const progressPercent = document.getElementById('progressPercent');
+    
+    progressBar.style.width = data.progress + '%';
+    progressText.textContent = data.message;
+    progressPercent.textContent = data.progress + '%';
+    
+    // Update step indicators
+    updateStepIndicators(data.stage);
+}
+
+function updateStepIndicators(stage) {
+    const steps = ['uploaded', 'analyzing', 'assessing', 'complete'];
+    const stepElements = ['step1', 'step2', 'step3', 'step4'];
+    
+    const currentStepIndex = steps.indexOf(stage);
+    
+    stepElements.forEach((stepId, index) => {
+        const element = document.getElementById(stepId);
+        element.classList.remove('active', 'completed');
+        
+        if (index < currentStepIndex) {
+            element.classList.add('completed');
+        } else if (index === currentStepIndex) {
+            element.classList.add('active');
+        }
+    });
+}
+
+function showResults(data) {
+    document.getElementById('progressCard').style.display = 'none';
+    document.getElementById('resultsCard').style.display = 'block';
+}
+
+function showError(message) {
+    document.getElementById('progressCard').style.display = 'none';
+    document.getElementById('uploadBtn').disabled = false;
+    
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-danger alert-dismissible fade show mt-3';
+    alert.innerHTML = `
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.querySelector('.card-body').appendChild(alert);
+}
+
+function clearFile() {
+    document.getElementById('fileInput').value = '';
+}
+
+function uploadAnother() {
+    document.getElementById('resultsCard').style.display = 'none';
+    document.getElementById('uploadForm').reset();
+    document.getElementById('uploadBtn').disabled = false;
+    currentAnalysisId = null;
+}
+
+function validateFile(file) {
+    const maxSize = 100 * 1024 * 1024; // 100MB
+    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'text/markdown'];
+    
+    if (file.size > maxSize) {
+        alert('File size must be less than 100MB');
+        clearFile();
+        return false;
+    }
+    
+    if (!allowedTypes.includes(file.type) && !file.name.match(/\.(pdf|docx|txt|md)$/i)) {
+        alert('Please select a valid file type (PDF, DOCX, TXT, MD)');
+        clearFile();
+        return false;
+    }
+    
+    return true;
+}
+</script>
+{% endblock %} 

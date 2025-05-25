@@ -1,0 +1,527 @@
+{% extends "base.html" %}
+
+{% block title %}Compliance Dashboard - DORA Compliance System{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 mb-1">
+                    <i class="fas fa-chart-line text-primary me-2"></i>
+                    Compliance Dashboard
+                </h1>
+                <p class="text-muted mb-0">Real-time DORA compliance analysis and insights</p>
+            </div>
+            <div>
+                <button class="btn btn-outline-primary me-2" onclick="refreshData()">
+                    <i class="fas fa-sync-alt me-1"></i>Refresh
+                </button>
+                <button class="btn btn-primary" onclick="exportReport()">
+                    <i class="fas fa-download me-1"></i>Export Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Key Metrics -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value text-warning" id="overallScore">73.2%</div>
+                <div class="metric-label">Overall Compliance</div>
+                <span class="status-badge status-amber">AMBER</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value text-danger" id="criticalGaps">2</div>
+                <div class="metric-label">Critical Gaps</div>
+                <small class="text-muted">Immediate attention required</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value text-success" id="investmentROI">2,431%</div>
+                <div class="metric-label">ROI Multiple</div>
+                <small class="text-muted">€5.48M NPV</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value text-info" id="penaltyRisk">€10M</div>
+                <div class="metric-label">Penalty Risk</div>
+                <small class="text-muted">Avoided with compliance</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Compliance Overview -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>DORA Domain Compliance</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="complianceChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-pie-chart me-2"></i>Gap Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="gapChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Analysis -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list-alt me-2"></i>Compliance Domains</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="domain-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">ICT Governance</h6>
+                                <span class="status-badge status-green">78.5%</span>
+                            </div>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-success" style="width: 78.5%"></div>
+                            </div>
+                            <small class="text-muted">Strong governance structure, clear accountability</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="domain-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">ICT Risk Management</h6>
+                                <span class="status-badge status-amber">69.8%</span>
+                            </div>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-warning" style="width: 69.8%"></div>
+                            </div>
+                            <small class="text-muted">Good framework, missing automated tools</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="domain-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">ICT Incident Management</h6>
+                                <span class="status-badge status-amber">71.4%</span>
+                            </div>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-warning" style="width: 71.4%"></div>
+                            </div>
+                            <small class="text-muted">Process documented, classification needs clarity</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="domain-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Digital Operational Resilience Testing</h6>
+                                <span class="status-badge status-red">62.1%</span>
+                            </div>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-danger" style="width: 62.1%"></div>
+                            </div>
+                            <small class="text-muted">Ad-hoc testing only, no comprehensive programme</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="domain-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">ICT Third-party Risk</h6>
+                                <span class="status-badge status-green">81.3%</span>
+                            </div>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-success" style="width: 81.3%"></div>
+                            </div>
+                            <small class="text-muted">Strong vendor management, clear contracts</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="domain-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Information Sharing</h6>
+                                <span class="status-badge status-red">45.2%</span>
+                            </div>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-danger" style="width: 45.2%"></div>
+                            </div>
+                            <small class="text-muted">No formal sharing arrangements, limited intelligence</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Critical Gaps -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle text-danger me-2"></i>Critical Gaps</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-6 mb-3">
+                        <div class="alert alert-danger">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="alert-heading">GAP-001: Digital Operational Resilience Testing</h6>
+                                    <p class="mb-2">No comprehensive digital operational resilience testing programme in place</p>
+                                    <small><strong>DORA Reference:</strong> Article 24, 25</small>
+                                </div>
+                                <span class="badge bg-danger">Critical</span>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small><strong>Effort:</strong> 6-9 months</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <small><strong>Investment:</strong> €250K - €400K</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-3">
+                        <div class="alert alert-danger">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="alert-heading">GAP-002: Information Sharing</h6>
+                                    <p class="mb-2">No cyber threat information sharing arrangements with authorities or peers</p>
+                                    <small><strong>DORA Reference:</strong> Article 45, 46</small>
+                                </div>
+                                <span class="badge bg-danger">Critical</span>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small><strong>Effort:</strong> 3-4 months</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <small><strong>Investment:</strong> €80K - €120K</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Implementation Timeline -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Implementation Timeline</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h6>Q1 2025 - Assessment Phase</h6>
+                            <p class="mb-1">Detailed gap assessment with external DORA specialists</p>
+                            <small class="text-muted">Immediate - 3 months</small>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-warning"></div>
+                        <div class="timeline-content">
+                            <h6>Q2-Q3 2025 - Implementation Phase 1</h6>
+                            <p class="mb-1">Critical gaps: Testing programme, Information sharing, Risk management tools</p>
+                            <small class="text-muted">6 months | €400K - €600K</small>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-info"></div>
+                        <div class="timeline-content">
+                            <h6>Q4 2025-Q1 2026 - Implementation Phase 2</h6>
+                            <p class="mb-1">Remaining gaps: Incident management, Third-party risk, Continuous monitoring</p>
+                            <small class="text-muted">6 months | €250K - €350K</small>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-success"></div>
+                        <div class="timeline-content">
+                            <h6>Q2 2026+ - Continuous Improvement</h6>
+                            <p class="mb-1">Ongoing optimization and compliance monitoring</p>
+                            <small class="text-muted">€120K - €180K annually</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.domain-card {
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 1rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #dee2e6;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -2rem;
+    top: 0.5rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #dee2e6;
+}
+
+.timeline-content {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--primary-color);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let complianceChart = null;
+let gapChart = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboardData();
+});
+
+function loadDashboardData() {
+    // Load demo data
+    fetch('/api/demo-data')
+        .then(response => response.json())
+        .then(data => {
+            updateDashboard(data);
+        })
+        .catch(error => {
+            console.error('Error loading dashboard data:', error);
+            showError('Failed to load dashboard data');
+        });
+}
+
+function updateDashboard(data) {
+    // Update key metrics
+    if (data.dora_compliance) {
+        document.getElementById('overallScore').textContent = data.dora_compliance.overall_score + '%';
+        document.getElementById('criticalGaps').textContent = data.dora_compliance.critical_gaps;
+    }
+    
+    // Create charts
+    createComplianceChart(data);
+    createGapChart(data);
+}
+
+function createComplianceChart(data) {
+    const ctx = document.getElementById('complianceChart').getContext('2d');
+    
+    if (complianceChart) {
+        complianceChart.destroy();
+    }
+    
+    const domains = [
+        'ICT Governance',
+        'ICT Risk Management', 
+        'ICT Incident Management',
+        'Digital Operational Resilience Testing',
+        'ICT Third-party Risk',
+        'Information Sharing'
+    ];
+    
+    const scores = [78.5, 69.8, 71.4, 62.1, 81.3, 45.2];
+    
+    complianceChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: domains,
+            datasets: [{
+                label: 'Compliance Score (%)',
+                data: scores,
+                backgroundColor: scores.map(score => {
+                    if (score >= 75) return '#27ae60';
+                    if (score >= 60) return '#f39c12';
+                    return '#e74c3c';
+                }),
+                borderColor: '#2c3e50',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createGapChart(data) {
+    const ctx = document.getElementById('gapChart').getContext('2d');
+    
+    if (gapChart) {
+        gapChart.destroy();
+    }
+    
+    gapChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Critical', 'High Priority', 'Medium Priority', 'Compliant'],
+            datasets: [{
+                data: [2, 5, 8, 32],
+                backgroundColor: ['#e74c3c', '#f39c12', '#3498db', '#27ae60'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed + ' gaps';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function refreshData() {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Refreshing...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        loadDashboardData();
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }, 1000);
+}
+
+function exportReport() {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Exporting...';
+    btn.disabled = true;
+    
+    // Simulate export
+    setTimeout(() => {
+        // Create a simple report download
+        const reportData = {
+            timestamp: new Date().toISOString(),
+            overall_compliance: '73.2%',
+            critical_gaps: 2,
+            roi_multiple: '2,431%',
+            penalty_risk: '€10M'
+        };
+        
+        const blob = new Blob([JSON.stringify(reportData, null, 2)], {
+            type: 'application/json'
+        });
+        
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'dora-compliance-report.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }, 1500);
+}
+
+function showError(message) {
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-danger alert-dismissible fade show';
+    alert.innerHTML = `
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.querySelector('.container').insertBefore(alert, document.querySelector('.container').firstChild);
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - DORA Compliance System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center py-5">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-shield-alt me-3"></i>
+                    DORA Compliance System
+                </h1>
+                <p class="lead mb-4">
+                    AI-powered compliance platform for Digital Operational Resilience Act
+                </p>
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <h3 class="mb-1">€5.48M</h3>
+                                <small>Net Present Value</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h3 class="mb-1">2,431%</h3>
+                                <small>ROI Multiple</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h3 class="mb-1">€10M</h3>
+                                <small>Penalty Risk Avoided</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h3 class="mb-1">65.1%</h3>
+                                <small>Internal Rate Return</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-upload fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Upload Policy Document</h5>
+                <p class="card-text">Upload your policy documents for AI-powered DORA compliance analysis</p>
+                <a href="/upload" class="btn btn-primary">
+                    <i class="fas fa-upload me-2"></i>Start Analysis
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                <h5 class="card-title">View Dashboard</h5>
+                <p class="card-text">Explore compliance scores, gap analysis, and implementation roadmaps</p>
+                <a href="/dashboard" class="btn btn-success">
+                    <i class="fas fa-chart-line me-2"></i>View Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-file-alt fa-3x text-info mb-3"></i>
+                <h5 class="card-title">Demo Data</h5>
+                <p class="card-text">Explore the system with pre-loaded demo compliance data</p>
+                <button class="btn btn-info" onclick="loadDemoData()">
+                    <i class="fas fa-play me-2"></i>Load Demo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Agents Overview -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-4"><i class="fas fa-robot me-2"></i>AI Agent Architecture</h2>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-search fa-2x text-primary me-3"></i>
+                    <div>
+                        <h6 class="card-title mb-0">Policy Analyzer</h6>
+                        <small class="text-muted">Document Analysis</small>
+                    </div>
+                </div>
+                <p class="card-text small">Analyzes policy documents and detects compliance gaps across 47 DORA requirements</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-exclamation-triangle fa-2x text-warning me-3"></i>
+                    <div>
+                        <h6 class="card-title mb-0">Gap Assessment</h6>
+                        <small class="text-muted">Risk Prioritization</small>
+                    </div>
+                </div>
+                <p class="card-text small">Prioritizes compliance gaps and creates detailed remediation roadmaps</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-calculator fa-2x text-success me-3"></i>
+                    <div>
+                        <h6 class="card-title mb-0">Risk Calculator</h6>
+                        <small class="text-muted">Financial Modeling</small>
+                    </div>
+                </div>
+                <p class="card-text small">Models financial impact, ROI analysis, and penalty risk calculations</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-tasks fa-2x text-info me-3"></i>
+                    <div>
+                        <h6 class="card-title mb-0">Implementation Planner</h6>
+                        <small class="text-muted">Project Roadmaps</small>
+                    </div>
+                </div>
+                <p class="card-text small">Generates detailed implementation plans with timelines and resource allocation</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-chart-pie fa-2x text-danger me-3"></i>
+                    <div>
+                        <h6 class="card-title mb-0">Executive Reporting</h6>
+                        <small class="text-muted">Board Presentations</small>
+                    </div>
+                </div>
+                <p class="card-text small">Creates board-ready reports and strategic presentations</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Status -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-heartbeat me-2"></i>System Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <div class="metric-card">
+                            <div class="metric-value text-success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="metric-label">AI Agents</div>
+                            <small class="text-muted">All 5 agents operational</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="metric-card">
+                            <div class="metric-value text-success">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="metric-label">Data Systems</div>
+                            <small class="text-muted">Demo mode active</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="metric-card">
+                            <div class="metric-value text-info">
+                                <i class="fas fa-cloud"></i>
+                            </div>
+                            <div class="metric-label">Infrastructure</div>
+                            <small class="text-muted">Local deployment</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="metric-card">
+                            <div class="metric-value text-warning">
+                                <i class="fas fa-key"></i>
+                            </div>
+                            <div class="metric-label">API Keys</div>
+                            <small class="text-muted">Configure for full features</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function loadDemoData() {
+    // Show loading state
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
+    btn.disabled = true;
+    
+    // Simulate loading demo data
+    setTimeout(() => {
+        window.location.href = '/dashboard';
+    }, 1500);
+}
+
+// Add some interactive elements
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate metric values on page load
+    const metricValues = document.querySelectorAll('.metric-value');
+    metricValues.forEach((element, index) => {
+        setTimeout(() => {
+            element.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                element.style.transform = 'scale(1)';
+            }, 200);
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %} 
