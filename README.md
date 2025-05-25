@@ -269,6 +269,16 @@ pwd
 python demo_app.py
 ```
 
+**Issue: `TemplateNotFound` error**
+```bash
+# This has been fixed in the latest version
+# Make sure you have the latest code:
+git pull origin master
+
+# The templates/ directory should exist with HTML files
+ls templates/
+```
+
 ### Quick Demo Setup (Minimal)
 
 If you encounter dependency issues, try this minimal setup:
