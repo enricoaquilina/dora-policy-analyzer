@@ -43,9 +43,31 @@ This system provides:
 ### Prerequisites
 
 - **Python 3.11+** (recommended: 3.11 or 3.12)
-- **Node.js 18+** (for some infrastructure components)
 - **Git** for version control
 - **Docker** (optional, for containerized deployment)
+
+### Option 1: Automated Setup (Recommended)
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/enricoaquilina/dora-policy-analyzer.git
+cd dora-policy-analyzer
+
+# 2. Run automated setup
+python setup.py
+
+# 3. Activate virtual environment
+source venv/bin/activate  # On macOS/Linux
+# venv\Scripts\activate   # On Windows
+
+# 4. Edit .env file with your API keys
+nano .env  # or use your preferred editor
+
+# 5. Run the demo
+python demo_app.py
+```
+
+### Option 2: Manual Setup
 
 ### 1. Clone the Repository
 
@@ -74,6 +96,9 @@ pip install --upgrade pip
 
 ```bash
 # Install main application dependencies
+pip install -r requirements.txt
+
+# For full functionality, also install policy analyzer dependencies
 pip install -r policy-analyzer-agent/requirements.txt
 
 # Install additional components (optional)
@@ -187,6 +212,59 @@ terraform apply
 
 # Deploy with Kubernetes
 kubectl apply -f kubernetes/
+```
+
+## 🛠️ **Troubleshooting**
+
+### Common Installation Issues
+
+**Issue: `ModuleNotFoundError: No module named 'flask'`**
+```bash
+# Solution: Install dependencies in the correct order
+pip install -r requirements.txt
+```
+
+**Issue: `textract` installation fails**
+```bash
+# Solution: Skip optional dependencies or install manually
+pip install -r requirements.txt --no-deps
+pip install Flask Flask-SocketIO eventlet anthropic openai
+```
+
+**Issue: Python version compatibility**
+```bash
+# Ensure you're using Python 3.11 or 3.12
+python --version
+# If needed, install the correct Python version
+```
+
+**Issue: Demo app won't start**
+```bash
+# Check if you're in the project root directory
+pwd
+# Should show: /path/to/dora-policy-analyzer
+
+# Run from project root
+python demo_app.py
+```
+
+### Quick Demo Setup (Minimal)
+
+If you encounter dependency issues, try this minimal setup:
+
+```bash
+# 1. Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On macOS/Linux
+
+# 2. Install minimal dependencies
+pip install flask flask-socketio eventlet python-dotenv
+
+# 3. Set up environment (optional for demo)
+cp .env.example .env
+
+# 4. Run demo
+python demo_app.py
 ```
 
 ## 🧪 **Testing**
