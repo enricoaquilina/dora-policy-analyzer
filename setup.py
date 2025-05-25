@@ -106,14 +106,16 @@ def main():
     
     print("\n🎉 Setup completed successfully!")
     print("\n📋 Next steps:")
-    print("1. Edit .env file with your API keys")
-    print("2. Activate virtual environment:")
+    print("1. Edit .env file with your API keys (optional for demo)")
+    print("2. Run the demo:")
+    print("   python run_demo.py")
+    print("   OR activate virtual environment first:")
     if os.name == 'nt':
         print("   venv\\Scripts\\activate")
     else:
         print("   source venv/bin/activate")
-    print("3. Run the demo: python demo_app.py")
-    print("4. Open http://localhost:5001 in your browser")
+    print("   python demo_app.py")
+    print("3. Open http://localhost:5001 in your browser")
 
 if __name__ == "__main__":
     main() 

@@ -64,6 +64,13 @@ source venv/bin/activate  # On macOS/Linux
 nano .env  # or use your preferred editor
 
 # 5. Run the demo
+python run_demo.py
+```
+
+**Alternative:** If you prefer to activate the virtual environment manually:
+```bash
+source venv/bin/activate  # On macOS/Linux
+# venv\Scripts\activate   # On Windows
 python demo_app.py
 ```
 
@@ -139,7 +146,12 @@ UPLOAD_FOLDER=uploads
 ### 5. Run the Demo Application
 
 ```bash
-# Start the demo web application
+# Option A: Use the demo runner (recommended)
+python run_demo.py
+
+# Option B: Activate virtual environment manually
+source venv/bin/activate  # On macOS/Linux
+# venv\Scripts\activate   # On Windows
 python demo_app.py
 ```
 
@@ -220,8 +232,17 @@ kubectl apply -f kubernetes/
 
 **Issue: `ModuleNotFoundError: No module named 'flask'`**
 ```bash
-# Solution: Install dependencies in the correct order
-pip install -r requirements.txt
+# Solution 1: Use the demo runner (automatically uses correct environment)
+python run_demo.py
+
+# Solution 2: Activate virtual environment first
+source venv/bin/activate  # On macOS/Linux
+# venv\Scripts\activate   # On Windows
+python demo_app.py
+
+# Solution 3: Use virtual environment Python directly
+venv/bin/python demo_app.py  # On macOS/Linux
+# venv\Scripts\python demo_app.py  # On Windows
 ```
 
 **Issue: `textract` installation fails**
