@@ -1,0 +1,31 @@
+# DORA Compliance System - Main Requirements
+# Essential dependencies for running the demo application
+
+# Web Framework
+Flask>=3.0.0
+Flask-SocketIO>=5.3.6
+eventlet>=0.35.2
+
+# AI Model APIs
+anthropic>=0.21.3
+openai>=1.12.0
+google-generativeai>=0.5.4
+
+# Document Processing
+PyPDF2>=3.0.1
+python-docx>=0.8.11
+pdfplumber>=0.9.0
+pymupdf>=1.23.0
+
+# Data Processing
+pandas>=2.1.0
+numpy>=1.24.0
+
+# HTTP and Utilities
+requests>=2.31.0
+python-dotenv>=1.0.0
+rich>=13.6.0
+
+# Development
+pytest>=7.4.0
+black>=23.9.0 
