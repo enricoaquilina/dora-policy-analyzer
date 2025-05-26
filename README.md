@@ -17,6 +17,26 @@ This system provides:
 - **Executive reporting** with board-ready presentations
 - **Implementation roadmaps** with detailed timelines and resource allocation
 
+## 📸 **Screenshots**
+
+> 📝 **Note**: The screenshots below are currently placeholders. To see the actual interface, run `python run_demo.py` and visit http://localhost:5001
+
+### Main Dashboard
+![Main Dashboard](screenshots/dashboard-main.png)
+*AI-powered dashboard with financial impact metrics, quick actions, and system overview*
+
+### Document Upload Interface
+![Upload Interface](screenshots/upload-interface.png)
+*Intuitive document upload with real-time progress tracking and AI analysis*
+
+### Compliance Analysis Dashboard
+![Compliance Dashboard](screenshots/compliance-dashboard.png)
+*Comprehensive compliance dashboard with interactive charts, gap analysis, and implementation timeline*
+
+### Mobile Responsive Design
+![Mobile View](screenshots/mobile-view.png)
+*Fully responsive design optimized for mobile and tablet devices*
+
 ### 💰 **Proven Financial Impact**
 
 ```
@@ -547,12 +567,23 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Ready to see the system in action?**
 
-1. **Quick Demo**: `python demo_app.py` → http://localhost:5001
+1. **Quick Demo**: `python run_demo.py` → http://localhost:5001
 2. **Upload a policy document** and watch real-time AI analysis
 3. **Explore the compliance dashboard** with interactive charts
 4. **Generate executive reports** ready for board presentation
 
+> 💡 **See the screenshots above** for a preview of the user interface and features
+
 **Transform your DORA compliance journey with AI-powered automation!**
+
+### Demo Features Showcase
+
+| Feature | Description | Screenshot |
+|---------|-------------|------------|
+| 🏠 **Main Dashboard** | Executive overview with key metrics and quick actions | [View →](screenshots/dashboard-main.png) |
+| 📤 **Document Upload** | AI-powered document analysis with progress tracking | [View →](screenshots/upload-interface.png) |
+| 📊 **Compliance Dashboard** | Interactive charts and detailed gap analysis | [View →](screenshots/compliance-dashboard.png) |
+| 📱 **Mobile Ready** | Responsive design for all devices | [View →](screenshots/mobile-view.png) |
 
 ---
 
