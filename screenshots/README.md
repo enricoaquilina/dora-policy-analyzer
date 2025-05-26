@@ -1,61 +1,26 @@
-# Screenshots for DORA Compliance System
+# Screenshots
 
-This directory contains screenshots for the README documentation.
+This directory contains screenshots of the DORA Compliance System interface.
 
-## Required Screenshots
+## Current Screenshots
 
-Please take the following screenshots while the demo app is running at http://localhost:5001:
+### `dashboard-preview.png`
+- **Description**: Main dashboard showing the hero section with financial metrics and quick actions
+- **Size**: Recommended 1200x800px or similar
+- **Usage**: Featured in the main README as a UI preview
 
-### 1. Main Dashboard (`dashboard-main.png`)
-- Navigate to: http://localhost:5001
-- Capture: Full page showing the hero section, quick actions, AI agents overview, and system status
-- Recommended size: 1200x800px
+## Adding Screenshots
 
-### 2. Upload Interface (`upload-interface.png`)
-- Navigate to: http://localhost:5001/upload
-- Capture: The document upload form with help sections
-- Recommended size: 1200x800px
+To add or update screenshots:
 
-### 3. Compliance Dashboard (`compliance-dashboard.png`)
-- Navigate to: http://localhost:5001/dashboard
-- Capture: The full compliance dashboard with charts, metrics, and timeline
-- Recommended size: 1200x1000px (longer to show full dashboard)
+1. Take a screenshot of the running application at http://localhost:5001
+2. Save as PNG format for best quality
+3. Use descriptive filenames
+4. Update the main README.md to reference new screenshots
 
-### 4. Mobile View (`mobile-view.png`)
-- Use browser dev tools to simulate mobile view (iPhone 12 Pro or similar)
-- Navigate to: http://localhost:5001
-- Capture: Responsive mobile layout
-- Recommended size: 375x812px
+## Guidelines
 
-## Screenshot Guidelines
-
-1. **Browser**: Use Chrome or Safari for consistent rendering
-2. **Zoom**: Set browser zoom to 100%
-3. **Window Size**: Use consistent window sizes for desktop screenshots
-4. **Quality**: Save as PNG for best quality
-5. **Naming**: Use exact filenames as listed above
-
-## Taking Screenshots
-
-### macOS:
-- **Full Page**: Cmd + Shift + 4, then spacebar, click window
-- **Selection**: Cmd + Shift + 4, drag to select area
-- **Mobile Dev Tools**: F12 → Device toolbar → Select device → Cmd + Shift + 4
-
-### Windows:
-- **Full Page**: Windows + Shift + S
-- **Browser Extension**: Use "Full Page Screen Capture" extension
-
-### Linux:
-- **Command Line**: `gnome-screenshot` or `scrot`
-- **GUI**: Use built-in screenshot tool
-
-## File Locations
-
-Place the screenshots in this directory with these exact names:
-- `dashboard-main.png`
-- `upload-interface.png` 
-- `compliance-dashboard.png`
-- `mobile-view.png`
-
-The README.md will automatically reference these files once they're added. 
+- Use consistent browser and zoom level (100%)
+- Capture clean, professional-looking interface
+- Avoid showing sensitive or placeholder data
+- Optimize file size while maintaining quality 
